@@ -1,0 +1,20 @@
+# requirements.txt
+
+# === FRAMEWORK UTAMA ===
+langchain==0.3.25
+langchain-google-genai==2.1.4
+langchain-community==0.3.24
+langchain-chroma==0.2.4
+langchain-groq==0.3.2
+
+# === VECTOR DATABASE ===
+chromadb>=1.0.9
+
+# === DOCUMENT PROCESSING ===
+pypdf==5.4.0
+
+# === UI ===
+streamlit==1.45.0
+
+# === UTILITIES ===
+python-dotenv==1.1.0
