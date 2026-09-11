@@ -1,86 +1,89 @@
-# app.py
+"""
+Regula — Regulatory Intelligence Assistant
 
-import streamlit as st
-import tempfile
-import os
+Streamlit frontend for the Agentic AI backend.
+The frontend communicates with FastAPI /query instead of directly
+initializing or mutating the RAG/vectorstore.
+"""
+
+import re
 import time
-from pathlib import Path
+from typing import Any, Dict, List
 
-from src.rag_chain import build_rag_chain, ask, setup_vectorstore, format_sources_for_display
-from src.document_loader import load_single_pdf
-from src.text_splitter import split_documents
-from src.embeddings import (
-    load_vectorstore,
-    create_vectorstore,
-    add_documents_to_vectorstore,  # import dari embeddings, bukan tulis ulang di sini
-    vectorstore_exists
+import requests
+import streamlit as st
+import os
+
+
+# ============================================================
+# KONFIGURASI
+# ============================================================
+
+API_URL = os.getenv(
+    "API_URL",
+    "http://127.0.0.1:8000",
 )
-from src.logger import setup_logger, log_query, log_document_added, log_error
-from dotenv import load_dotenv
-load_dotenv()
-
-
-# ============================================================
-# KONFIGURASI HALAMAN
-# ============================================================
 
 st.set_page_config(
-    page_title="LexAI — Asisten Hukum Indonesia",
+    page_title="Regula — Regulatory Intelligence Assistant",
     page_icon="⚖️",
-    layout="centered"  # centered agar mirip ChatGPT, tidak full width
+    layout="centered",
 )
 
-# CSS custom untuk mempercantik tampilan
-# Kita inject CSS untuk hal-hal yang tidak bisa dilakukan Streamlit secara native
-st.markdown("""
+
+# ============================================================
+# CSS
+# ============================================================
+
+st.markdown(
+    """
 <style>
-    /* Sembunyikan header & footer bawaan Streamlit */
     #MainMenu { visibility: hidden; }
     footer { visibility: hidden; }
     header { visibility: hidden; }
 
-    /* Lebar konten utama — mirip ChatGPT yang tidak terlalu lebar */
     .block-container {
         max-width: 780px;
         padding-top: 2rem;
         padding-bottom: 1rem;
     }
 
-    /* Styling chat message agar lebih bersih */
     [data-testid="stChatMessage"] {
         background: transparent !important;
         border: none !important;
         padding: 0.25rem 0 !important;
     }
 
-    /* Input chat — tambah sedikit radius */
     [data-testid="stChatInput"] textarea {
         border-radius: 12px !important;
     }
 
-    /* Hilangkan border merah/fokus default yang mengganggu */
     [data-testid="stChatInput"] {
         border-radius: 12px !important;
     }
 
-    /* Welcome screen — nama besar di tengah */
     .welcome-title {
         text-align: center;
         font-size: 2.2rem;
         font-weight: 700;
         margin-top: 4rem;
         margin-bottom: 0.5rem;
-        color: inherit;
     }
 
     .welcome-subtitle {
         text-align: center;
         font-size: 1rem;
         color: gray;
-        margin-bottom: 3rem;
+        margin-bottom: 2rem;
     }
 
-    /* Chip contoh pertanyaan */
+    .welcome-description {
+        text-align: center;
+        font-size: 0.9rem;
+        color: gray;
+        margin-bottom: 2rem;
+    }
+
     .stButton button {
         border-radius: 20px !important;
         border: 1px solid rgba(128,128,128,0.3) !important;
@@ -95,13 +98,24 @@ st.markdown("""
         background: rgba(128,128,128,0.1) !important;
     }
 
-    /* Sumber dokumen expander */
     [data-testid="stExpander"] {
         border: none !important;
         background: transparent !important;
     }
+
+    .status-ok {
+        font-size: 0.85rem;
+        color: #16803c;
+    }
+
+    .status-error {
+        font-size: 0.85rem;
+        color: #b42318;
+    }
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 
 # ============================================================
@@ -111,260 +125,359 @@ st.markdown("""
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-if "vectorstore" not in st.session_state:
-    st.session_state.vectorstore = None
-
-if "rag_chain" not in st.session_state:
-    st.session_state.rag_chain = None
-
-if "retriever" not in st.session_state:
-    st.session_state.retriever = None
-
-if "processed_files" not in st.session_state:
-    st.session_state.processed_files = []
-
-if "logger" not in st.session_state:
-    st.session_state.logger = setup_logger()
+if "api_status" not in st.session_state:
+    st.session_state.api_status = None
 
 
 # ============================================================
-# FUNGSI HELPER
+# API CLIENT
 # ============================================================
 
-def initialize_rag():
-    """Load vectorstore yang sudah ada dan bangun RAG chain."""
-    with st.spinner("Memuat sistem RAG..."):
-        vectorstore = setup_vectorstore()
-        rag_chain, retriever = build_rag_chain(vectorstore)
-        st.session_state.vectorstore = vectorstore
-        st.session_state.rag_chain = rag_chain
-        st.session_state.retriever = retriever
-
-
-def process_uploaded_pdf(uploaded_file) -> bool:
-    """
-    Menerima file PDF dari widget upload Streamlit,
-    lalu menambahkan isinya ke vectorstore yang sudah ada.
-    Menggunakan add_documents_to_vectorstore() dari embeddings.py.
-
-    Args:
-        uploaded_file: objek file dari st.file_uploader()
-
-    Returns:
-        True jika berhasil, False jika gagal
-    """
+def check_api_health() -> bool:
+    """Check whether the FastAPI backend is available."""
     try:
-        # Streamlit memberikan file sebagai bytes di memory.
-        # PyPDFLoader butuh path file di disk, jadi kita simpan sementara.
-        with tempfile.NamedTemporaryFile(
-            delete=False, suffix=".pdf"
-        ) as tmp_file:
-            tmp_file.write(uploaded_file.getvalue())
-            tmp_path = tmp_file.name
-
-        with st.spinner(f"Memproses {uploaded_file.name}..."):
-            documents = load_single_pdf(tmp_path)
-            chunks = split_documents(documents)
-
-            # Kalau vectorstore belum ada sama sekali, buat baru
-            if st.session_state.vectorstore is None:
-                vectorstore = create_vectorstore(chunks)
-            else:
-                # Kalau sudah ada, tambahkan saja dokumen barunya
-                # Fungsi ini sekarang diimport dari embeddings.py
-                vectorstore = add_documents_to_vectorstore(
-                    st.session_state.vectorstore,
-                    chunks
-                )
-
-            # Rebuild chain dengan vectorstore terbaru
-            rag_chain, retriever = build_rag_chain(vectorstore)
-            st.session_state.vectorstore = vectorstore
-            st.session_state.rag_chain = rag_chain
-            st.session_state.retriever = retriever
-
-        os.unlink(tmp_path)
-
-        log_document_added(
-            st.session_state.logger,
-            filename=uploaded_file.name,
-            num_chunks=len(chunks)
-        )
-
-        return True
-
-    except Exception as e:
-        st.error(f"Gagal memproses PDF: {str(e)}")
-        if 'tmp_path' in locals() and os.path.exists(tmp_path):
-            os.unlink(tmp_path)
+        response = requests.get(f"{API_URL}/health", timeout=5)
+        return response.ok
+    except requests.RequestException:
         return False
 
 
-def send_question(question: str):
-    """
-    Proses pertanyaan user, tampilkan di chat, dan generate jawaban.
-    Dipisah jadi fungsi tersendiri agar bisa dipanggil dari
-    input chat maupun tombol contoh pertanyaan.
-    """
-    # Tampilkan pesan user
+def query_agent(question: str) -> Dict[str, Any]:
+    """Send a question to the Agentic AI backend."""
+    response = requests.post(
+        f"{API_URL}/query",
+        json={"question": question},
+        timeout=120,
+    )
+
+    if response.ok:
+        return response.json()
+
+    try:
+        detail = response.json().get("detail", response.text)
+    except ValueError:
+        detail = response.text
+
+    raise RuntimeError(f"API error ({response.status_code}): {detail}")
+
+
+# ============================================================
+# RENDER HELPERS
+# ============================================================
+
+def clean_answer_for_display(answer: str) -> str:
+    """Remove formatting artifacts that should never reach the user."""
+    if not answer:
+        return ""
+
+    cleaned = answer
+    cleaned = re.sub(r"<br\s*/?>", "\n", cleaned, flags=re.IGNORECASE)
+    return cleaned.strip()
+
+
+def render_sources(sources: List[Dict[str, Any]]) -> None:
+    if not sources:
+        return
+
+    with st.expander("📚 Sources"):
+        for i, source in enumerate(sources, start=1):
+            metadata = source.get("metadata") or {}
+            content = source.get("content", "")
+
+            document_type = metadata.get("document_type", "")
+            number = metadata.get("regulation_number", "")
+            year = metadata.get("year", "")
+            pasal = metadata.get("pasal", "")
+            ayat = metadata.get("ayat", "")
+            page = metadata.get("page")
+
+            title_parts = []
+            if document_type:
+                title_parts.append(document_type)
+            if number:
+                title_parts.append(f"Nomor {number}")
+            if year:
+                title_parts.append(f"Tahun {year}")
+
+            title = " ".join(title_parts) or metadata.get(
+                "source", f"Source {i}")
+
+            if pasal:
+                title += f" — Pasal {pasal}"
+            if ayat:
+                title += f" Ayat {ayat}"
+            if page is not None:
+                title += f" · halaman {page}"
+
+            st.markdown(f"**{i}. {title}**")
+
+            source_name = metadata.get("source")
+            if source_name:
+                st.caption(f"📄 {source_name}")
+
+            if content:
+                st.caption(content[:1200])
+
+            if i < len(sources):
+                st.divider()
+
+
+def render_external_citations(
+    citations: List[Dict[str, Any]]
+) -> None:
+    """Render verified external regulatory sources as clickable citations."""
+    if not citations:
+        return
+
+    with st.expander("🌐 External Sources"):
+        for i, citation in enumerate(citations, start=1):
+            title = citation.get("title") or f"External source {i}"
+            url = str(citation.get("url") or "").strip()
+            source_name = citation.get(
+                "source_name") or citation.get("domain") or ""
+            tier = citation.get("source_tier")
+            evidence = citation.get("evidence") or ""
+
+            st.markdown(f"**{i}. {title}**")
+
+            meta = []
+            if source_name:
+                meta.append(str(source_name))
+            if tier is not None:
+                meta.append(f"Tier {tier}")
+            if meta:
+                st.caption(" · ".join(meta))
+
+            if url.startswith("https://"):
+                st.markdown(f"[Open source]({url})")
+
+            if evidence:
+                st.caption(evidence[:1200])
+
+            if i < len(citations):
+                st.divider()
+
+
+def render_missing_regulations(
+    missing_regulations: List[Dict[str, Any]]
+) -> None:
+    if not missing_regulations:
+        return
+
+    st.warning(
+        "Sumber regulasi yang diminta tidak tersedia dalam basis pengetahuan.")
+
+    with st.expander("🔍 Regulasi yang diminta"):
+        for item in missing_regulations:
+            if isinstance(item, dict):
+                document_type = item.get("document_type", "")
+                number = item.get("regulation_number", "")
+                year = item.get("year", "")
+
+                parts = [
+                    str(x)
+                    for x in [document_type, number, year]
+                    if x not in ("", None)
+                ]
+
+                if parts:
+                    st.write(" ".join(parts))
+                else:
+                    st.json(item)
+            else:
+                st.write(str(item))
+
+
+def render_agent_result(result: Dict[str, Any]) -> None:
+    """Render all structured fields returned by FastAPI."""
+    st.markdown(clean_answer_for_display(result.get("answer", "")))
+
+    render_missing_regulations(result.get("missing_regulations") or [])
+    render_sources(result.get("sources") or [])
+    render_external_citations(result.get("external_citations") or [])
+
+
+# ============================================================
+# CHAT
+# ============================================================
+
+def send_question(question: str) -> None:
+    question = question.strip()
+
+    if not question:
+        return
+
+    st.session_state.messages.append(
+        {
+            "role": "user",
+            "content": question,
+        }
+    )
+
     with st.chat_message("user"):
         st.markdown(question)
 
-    st.session_state.messages.append({
-        "role": "user",
-        "content": question
-    })
-
-    # Generate dan tampilkan jawaban
     with st.chat_message("assistant"):
-        with st.spinner("Mencari jawaban..."):
+        with st.spinner("Analyzing regulation..."):
             start_time = time.time()
 
-            result = ask(
-                st.session_state.rag_chain,
-                st.session_state.retriever,
-                question
-            )
+            try:
+                result = query_agent(question)
+                elapsed = time.time() - start_time
 
-            response_time = time.time() - start_time
+                render_agent_result(result)
 
-            log_query(
-                logger=st.session_state.logger,
-                query=question,
-                source_documents=result["sources"],
-                answer=result["answer"],
-                response_time=response_time
-            )
+                st.session_state.messages.append(
+                    {
+                        "role": "assistant",
+                        "content": result.get("answer", ""),
+                        "result": result,
+                        "response_time": elapsed,
+                    }
+                )
 
-        st.markdown(result["answer"])
+            except requests.RequestException as exc:
+                message = (
+                    "Backend API tidak dapat dihubungi. "
+                    "Pastikan FastAPI berjalan di "
+                    f"`{API_URL}`."
+                )
+                st.error(message)
+                st.caption(str(exc))
 
-        sources_text = format_sources_for_display(result["sources"])
-        with st.expander("📚 Lihat sumber dokumen"):
-            st.text(sources_text)
+                st.session_state.messages.append(
+                    {
+                        "role": "assistant",
+                        "content": message,
+                    }
+                )
 
-    st.session_state.messages.append({
-        "role": "assistant",
-        "content": result["answer"],
-        "sources": sources_text
-    })
+            except Exception as exc:
+                message = f"Terjadi error saat memproses pertanyaan: {exc}"
+                st.error(message)
+
+                st.session_state.messages.append(
+                    {
+                        "role": "assistant",
+                        "content": message,
+                    }
+                )
 
 
 # ============================================================
-# SIDEBAR — Upload & Manajemen Dokumen
+# SIDEBAR
 # ============================================================
 
 with st.sidebar:
-    st.markdown("### ⚖️ LexAI")
-    st.caption("Asisten Hukum Indonesia")
+    st.markdown("### ⚖️ Regula")
+    st.caption("Regulatory Intelligence Assistant")
     st.divider()
 
-    # Upload PDF
-    st.markdown("**Tambah Dokumen**")
-    uploaded_file = st.file_uploader(
-        "Upload PDF regulasi",
-        type="pdf",
-        label_visibility="collapsed",
-        help="Upload dokumen PDF peraturan atau regulasi Indonesia dari jdih.go.id"
-    )
+    st.markdown("**Backend**")
 
-    if uploaded_file:
-        if uploaded_file.name not in st.session_state.processed_files:
-            success = process_uploaded_pdf(uploaded_file)
-            if success:
-                st.session_state.processed_files.append(uploaded_file.name)
-                st.success(f"✅ Berhasil ditambahkan!")
-                st.rerun()
+    api_is_healthy = check_api_health()
 
-    # Daftar dokumen aktif
-    if st.session_state.processed_files:
-        st.divider()
-        st.markdown("**Dokumen Aktif**")
-        for fname in st.session_state.processed_files:
-            st.caption(f"📄 {fname}")
+    if api_is_healthy:
+        st.markdown(
+            '<p class="status-ok">● API connected</p>',
+            unsafe_allow_html=True,
+        )
+    else:
+        st.markdown(
+            '<p class="status-error">● API unavailable</p>',
+            unsafe_allow_html=True,
+        )
+        st.caption("Start FastAPI with:")
+        st.code("uvicorn src.api:app --reload")
 
-    # Tombol reset
     st.divider()
-    if st.button("🗑️ Reset Semua", use_container_width=True, type="secondary"):
-        import shutil
-        if Path("vectorstore").exists():
-            shutil.rmtree("vectorstore")
-        st.session_state.clear()
+
+    st.markdown("**Capabilities**")
+    st.caption("🔎 Regulatory research")
+    st.caption("⚖️ Regulation comparison")
+    st.caption("📊 Regulatory data analysis")
+    st.caption("📚 Source-grounded answers")
+
+    st.divider()
+
+    if st.button(
+        "🗑️ Clear conversation",
+        use_container_width=True,
+        type="secondary",
+    ):
+        st.session_state.messages = []
         st.rerun()
 
 
 # ============================================================
-# AREA UTAMA — Welcome Screen atau Chat
+# MAIN — WELCOME / CHAT HISTORY
 # ============================================================
 
-# Kalau belum ada percakapan → tampilkan welcome screen
 if not st.session_state.messages:
-    st.markdown('<p class="welcome-title">⚖️ LexAI</p>',
-                unsafe_allow_html=True)
     st.markdown(
-        '<p class="welcome-subtitle">Asisten tanya jawab dokumen hukum & regulasi Indonesia</p>',
-        unsafe_allow_html=True
+        '<p class="welcome-title">⚖️ Regula</p>',
+        unsafe_allow_html=True,
     )
 
-    # Contoh pertanyaan — hanya muncul kalau RAG sudah siap
-    if st.session_state.rag_chain is not None:
-        st.markdown(
-            "<p style='text-align:center; color:gray; font-size:0.85rem;'>"
-            "Contoh pertanyaan:</p>",
-            unsafe_allow_html=True
-        )
+    st.markdown(
+        '<p class="welcome-subtitle">'
+        "Regulatory Intelligence Assistant"
+        "</p>",
+        unsafe_allow_html=True,
+    )
 
-        # Tiga tombol contoh pertanyaan ditampilkan horizontal
-        col1, col2, col3 = st.columns(3)
-        example_questions = [
-            "Apa sanksi tidak membayar pajak?",
-            "Jelaskan hak wajib pajak",
-            "Apa itu surat ketetapan pajak?"
-        ]
+    st.markdown(
+        '<p class="welcome-description">'
+        "Research, compare, and analyze Indonesian regulations with AI."
+        "</p>",
+        unsafe_allow_html=True,
+    )
 
-        for col, question in zip([col1, col2, col3], example_questions):
-            with col:
-                if st.button(question, use_container_width=True):
-                    send_question(question)
-                    st.rerun()
+    st.markdown(
+        "<p style='text-align:center; color:gray; font-size:0.85rem;'>"
+        "Try asking:"
+        "</p>",
+        unsafe_allow_html=True,
+    )
 
-    elif not vectorstore_exists():
-        # Belum ada dokumen sama sekali
-        st.markdown(
-            "<p style='text-align:center; color:gray; margin-top:1rem;'>"
-            "Upload dokumen PDF di sidebar untuk memulai ⬅️</p>",
-            unsafe_allow_html=True
-        )
+    col1, col2, col3 = st.columns(3)
 
-# Kalau sudah ada percakapan → tampilkan riwayat chat
+    example_questions = [
+        "Apa ketentuan mengenai transaksi elektronik?",
+        "Bandingkan dua regulasi",
+        "Berapa jumlah regulasi berdasarkan sektor?",
+    ]
+
+    for col, question in zip([col1, col2, col3], example_questions):
+        with col:
+            if st.button(question, use_container_width=True):
+                send_question(question)
+                st.rerun()
+
 else:
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+            st.markdown(clean_answer_for_display(message["content"]))
 
-            if message["role"] == "assistant" and "sources" in message:
-                with st.expander("📚 Lihat sumber dokumen"):
-                    st.text(message["sources"])
+            if message["role"] == "assistant":
+                result = message.get("result")
+
+                if result:
+                    render_missing_regulations(
+                        result.get("missing_regulations") or []
+                    )
+                    render_sources(result.get("sources") or [])
+                    render_external_citations(
+                        result.get("external_citations") or [])
 
 
 # ============================================================
-# INPUT CHAT — selalu di bawah (fixed by Streamlit native)
+# CHAT INPUT
 # ============================================================
 
 if prompt := st.chat_input(
-    "Tanyakan sesuatu tentang dokumen hukum...",
-    disabled=(st.session_state.rag_chain is None)
+    "Ask about Indonesian regulations...",
+    disabled=not api_is_healthy,
 ):
-    if st.session_state.rag_chain is None:
-        st.warning("⚠️ Upload dokumen PDF terlebih dahulu.")
-    else:
-        send_question(prompt)
-        st.rerun()
-
-
-# ============================================================
-# INISIALISASI AWAL — load vectorstore kalau sudah ada di disk
-# ============================================================
-
-if st.session_state.rag_chain is None and vectorstore_exists():
-    initialize_rag()
+    send_question(prompt)
     st.rerun()

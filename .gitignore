@@ -17,7 +17,3 @@ venv/
 
 # Dokumen PDF (opsional, tergantung ukuran)
 data/documents/
-
-model_check.py
-sync_documents.py
-test_loader.py

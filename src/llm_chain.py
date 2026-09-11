@@ -28,8 +28,12 @@ def get_llm() -> ChatGroq:
             "Daftar di console.groq.com dan tambahkan key ke file .env"
         )
 
+    # Allow the model to be changed from .env without editing source code.
+    # GPT-OSS 20B is currently listed by Groq as a production model.
+    model_name = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
+
     llm = ChatGroq(
-        model="llama-3.3-70b-versatile",  # Model terbaik Groq untuk free tier
+        model=model_name,
         api_key=api_key,
         temperature=0.1,                  # Tetap rendah untuk dokumen hukum
         max_tokens=2048,
@@ -86,5 +90,5 @@ def test_llm_connection() -> None:
     response = llm.invoke("Jawab dengan satu kalimat: Apa itu hukum perdata?")
 
     print("Koneksi berhasil!")
-    print(f"Model : llama-3.3-70b-versatile")
+    print(f"Model : {os.getenv('GROQ_MODEL', 'openai/gpt-oss-20b')}")
     print(f"Respons: {response.content}")
