@@ -1,0 +1,8 @@
+[project]
+name = "regula-ai"
+version = "0.1.0"
+description = "Regulatory Intelligence Agent"
+requires-python = "==3.11.*"
+
+[tool.fastapi]
+entrypoint = "src.api:app"
