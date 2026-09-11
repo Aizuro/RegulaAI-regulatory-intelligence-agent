@@ -16,7 +16,7 @@ pymupdf>=1.24.0
 pytesseract>=0.3.13
 
 # === API === 
-fastapi>=0.115.0 
+fastapi[standard]>=0.115.0 
 uvicorn[standard]>=0.34.0
 
 # === UI ===
