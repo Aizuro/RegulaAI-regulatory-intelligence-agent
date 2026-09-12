@@ -11,10 +11,14 @@ from typing import Any, Dict, List
 from urllib.parse import quote, urlparse
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
+import logging
 import re
 
 
 # Official / trusted regulatory domains. Keep this allowlist conservative.
+logger = logging.getLogger(__name__)
+
+
 OFFICIAL_DOMAINS = {
     "peraturan.bpk.go.id": {
         "source_name": "JDIH BPK",
@@ -61,11 +65,25 @@ def _fetch(url: str, timeout: int = 10) -> str:
             )
         },
     )
+
+    logger.info("External research fetch: url=%s", url)
+
     with urlopen(request, timeout=timeout) as response:
         content_type = response.headers.get("Content-Type", "")
+        logger.info(
+            "External research response: status=%s content_type=%s",
+            getattr(response, "status", "unknown"),
+            content_type,
+        )
         if "text/html" not in content_type.lower():
+            logger.warning(
+                "External research skipped non-HTML response: content_type=%s",
+                content_type,
+            )
             return ""
-        return response.read().decode("utf-8", errors="replace")
+        body = response.read().decode("utf-8", errors="replace")
+        logger.info("External research body received: chars=%d", len(body))
+        return body
 
 
 def fetch_external_source(
@@ -91,7 +109,36 @@ def fetch_external_source(
 
     try:
         html = _fetch(url, timeout=timeout)
-    except (HTTPError, URLError, TimeoutError, ValueError):
+    except HTTPError as exc:
+        logger.warning(
+            "External source HTTP error: code=%s reason=%s url=%s",
+            exc.code,
+            exc.reason,
+            url,
+        )
+        return {
+            "status": "fetch_failed",
+            "source": result,
+            "evidence": "",
+        }
+    except URLError as exc:
+        logger.warning(
+            "External source URL error: reason=%s url=%s",
+            exc.reason,
+            url,
+        )
+        return {
+            "status": "fetch_failed",
+            "source": result,
+            "evidence": "",
+        }
+    except (TimeoutError, ValueError) as exc:
+        logger.warning(
+            "External source fetch error: type=%s detail=%s url=%s",
+            type(exc).__name__,
+            exc,
+            url,
+        )
         return {
             "status": "fetch_failed",
             "source": result,
@@ -139,13 +186,42 @@ def search_external_regulations(
         return []
 
     search_url = _build_bpk_search_url(query)
+    logger.info(
+        "External regulation search started: query_chars=%d max_results=%d url=%s",
+        len(query),
+        max_results,
+        search_url,
+    )
 
     try:
         html = _fetch(search_url)
-    except (HTTPError, URLError, TimeoutError, ValueError):
+    except HTTPError as exc:
+        logger.warning(
+            "External regulation search HTTP error: code=%s reason=%s url=%s",
+            exc.code,
+            exc.reason,
+            search_url,
+        )
+        return []
+    except URLError as exc:
+        logger.warning(
+            "External regulation search URL error: reason=%s url=%s",
+            exc.reason,
+            search_url,
+        )
+        return []
+    except (TimeoutError, ValueError) as exc:
+        logger.warning(
+            "External regulation search error: type=%s detail=%s url=%s",
+            type(exc).__name__,
+            exc,
+            search_url,
+        )
         return []
 
     if not html:
+        logger.warning(
+            "External regulation search returned empty HTML: url=%s", search_url)
         return []
 
     title = _extract_title(html)
@@ -162,7 +238,18 @@ def search_external_regulations(
 
     snippet = text[:1000]
     if not snippet:
+        logger.warning(
+            "External regulation search produced empty text: title=%s url=%s",
+            title,
+            search_url,
+        )
         return []
+
+    logger.info(
+        "External regulation search produced search-page evidence: title=%s snippet_chars=%d",
+        title,
+        len(snippet),
+    )
 
     return [
         {
