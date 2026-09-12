@@ -11,14 +11,10 @@ from typing import Any, Dict, List
 from urllib.parse import quote, urlparse
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
-import logging
 import re
 
 
 # Official / trusted regulatory domains. Keep this allowlist conservative.
-logger = logging.getLogger(__name__)
-
-
 OFFICIAL_DOMAINS = {
     "peraturan.bpk.go.id": {
         "source_name": "JDIH BPK",
@@ -95,23 +91,12 @@ def _fetch(url: str, timeout: int = 10) -> str:
         },
     )
 
-    logger.info("External research fetch: url=%s", url)
 
     with urlopen(request, timeout=timeout) as response:
         content_type = response.headers.get("Content-Type", "")
-        logger.info(
-            "External research response: status=%s content_type=%s",
-            getattr(response, "status", "unknown"),
-            content_type,
-        )
         if "text/html" not in content_type.lower():
-            logger.warning(
-                "External research skipped non-HTML response: content_type=%s",
-                content_type,
-            )
             return ""
         body = response.read().decode("utf-8", errors="replace")
-        logger.info("External research body received: chars=%d", len(body))
         return body
 
 
@@ -139,35 +124,18 @@ def fetch_external_source(
     try:
         html = _fetch(url, timeout=timeout)
     except HTTPError as exc:
-        logger.warning(
-            "External source HTTP error: code=%s reason=%s url=%s",
-            exc.code,
-            exc.reason,
-            url,
-        )
         return {
             "status": "fetch_failed",
             "source": result,
             "evidence": "",
         }
     except URLError as exc:
-        logger.warning(
-            "External source URL error: reason=%s url=%s",
-            exc.reason,
-            url,
-        )
         return {
             "status": "fetch_failed",
             "source": result,
             "evidence": "",
         }
     except (TimeoutError, ValueError) as exc:
-        logger.warning(
-            "External source fetch error: type=%s detail=%s url=%s",
-            type(exc).__name__,
-            exc,
-            url,
-        )
         return {
             "status": "fetch_failed",
             "source": result,
@@ -237,49 +205,17 @@ def search_external_regulations(
         ]
 
     for source_label, search_url in search_targets:
-        logger.info(
-            "External regulation search started: source=%s query_chars=%d max_results=%d url=%s",
-            source_label,
-            len(query),
-            max_results,
-            search_url,
-        )
 
         try:
             html = _fetch(search_url)
         except HTTPError as exc:
-            logger.warning(
-                "External regulation search HTTP error: source=%s code=%s reason=%s url=%s",
-                source_label,
-                exc.code,
-                exc.reason,
-                search_url,
-            )
             continue
         except URLError as exc:
-            logger.warning(
-                "External regulation search URL error: source=%s reason=%s url=%s",
-                source_label,
-                exc.reason,
-                search_url,
-            )
             continue
         except (TimeoutError, ValueError) as exc:
-            logger.warning(
-                "External regulation search error: source=%s type=%s detail=%s url=%s",
-                source_label,
-                type(exc).__name__,
-                exc,
-                search_url,
-            )
             continue
 
         if not html:
-            logger.warning(
-                "External regulation search returned empty HTML: source=%s url=%s",
-                source_label,
-                search_url,
-            )
             continue
 
         title = _extract_title(html)
@@ -291,28 +227,12 @@ def search_external_regulations(
         source = OFFICIAL_DOMAINS.get(domain)
 
         if not source:
-            logger.warning(
-                "External regulation search domain is not allowlisted: url=%s",
-                search_url,
-            )
             continue
 
         snippet = text[:1000]
         if not snippet:
-            logger.warning(
-                "External regulation search produced empty text: source=%s title=%s url=%s",
-                source_label,
-                title,
-                search_url,
-            )
             continue
 
-        logger.info(
-            "External regulation search produced search-page evidence: source=%s title=%s snippet_chars=%d",
-            source_label,
-            title,
-            len(snippet),
-        )
 
         return [
             {
@@ -325,10 +245,6 @@ def search_external_regulations(
             }
         ][:max_results]
 
-    logger.warning(
-        "External regulation search exhausted all official sources without a result: query=%s",
-        query,
-    )
     return []
 
 
