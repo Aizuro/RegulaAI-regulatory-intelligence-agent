@@ -10,6 +10,7 @@ Run from the project root:
 from __future__ import annotations
 
 from typing import Any, Dict, List
+import logging
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
@@ -24,6 +25,7 @@ app = FastAPI(
     version="6.5.0",
 )
 
+logger = logging.getLogger(__name__)
 _vectorstore = None
 _agent = None
 
@@ -100,6 +102,7 @@ def query(request: QueryRequest) -> QueryResponse:
     try:
         result = get_agent().invoke(question)
     except Exception as exc:
+        logger.exception("Agent execution failed")
         raise HTTPException(
             status_code=500,
             detail=f"Agent execution failed: {type(exc).__name__}: {exc}",
