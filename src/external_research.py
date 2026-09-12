@@ -28,6 +28,10 @@ OFFICIAL_DOMAINS = {
         "source_name": "JDIHN",
         "source_tier": 1,
     },
+    "jdih.kemenkeu.go.id": {
+        "source_name": "JDIH Kementerian Keuangan",
+        "source_tier": 1,
+    },
 }
 
 
@@ -48,6 +52,23 @@ def _build_jdihn_search_url(query: str) -> str:
         "https://jdihn.go.id/pencarian?instansi=&jenis="
         f"&keyword={quote(query)}&nomor=&status=&tahun="
     )
+
+
+def _build_kemenkeu_perpres_url(number: str, year: str) -> str:
+    """Build the canonical JDIH Kemenkeu page for a Perpres."""
+    return f"https://jdih.kemenkeu.go.id/dok/perpres-{number}-tahun-{year}/overview"
+
+
+def _extract_perpres_reference(query: str):
+    """Extract an explicit Perpres number/year from a user query."""
+    match = re.search(
+        r"Peraturan\s+Presiden\s+Nomor\s+(\d+)\s+Tahun\s+(\d{4})",
+        query,
+        flags=re.IGNORECASE,
+    )
+    if not match:
+        return None
+    return match.group(1), match.group(2)
 
 
 def _extract_title(html: str) -> str:
@@ -184,10 +205,10 @@ def search_external_regulations(
     """
     Search controlled external regulatory sources.
 
-    Search official Tier-1 regulatory sources in priority order. JDIH BPK
-    is attempted first; JDIHN is used as a fallback when BPK is unavailable
-    from the deployment environment. Results are metadata/snippets; no
-    content is inserted into the RAG.
+    Search official Tier-1 regulatory sources in priority order. For an
+    explicit Perpres reference, use the canonical JDIH Kementerian Keuangan
+    page first; BPK and JDIHN remain fallbacks for broader searches. Results
+    are metadata/snippets; no content is inserted into the RAG.
     """
     query = str(query or "").strip()
     max_results = max(1, min(int(max_results), 10))
@@ -195,13 +216,25 @@ def search_external_regulations(
     if not query:
         return []
 
-    # Try BPK first because it is the primary source in V6.1. If the
-    # deployment environment is denied access (for example HTTP 403),
-    # fall back to JDIHN, which is also an allowlisted Tier-1 official source.
-    search_targets = [
-        ("JDIH BPK", _build_bpk_search_url(query)),
-        ("JDIHN", _build_jdihn_search_url(query)),
-    ]
+    # Prefer a deterministic official page when the query explicitly names
+    # a Perpres. This avoids relying on search-page endpoints that may be
+    # blocked by the cloud deployment environment.
+    perpres_reference = _extract_perpres_reference(query)
+    if perpres_reference:
+        number, year = perpres_reference
+        search_targets = [
+            (
+                "JDIH Kementerian Keuangan",
+                _build_kemenkeu_perpres_url(number, year),
+            ),
+            ("JDIH BPK", _build_bpk_search_url(query)),
+            ("JDIHN", _build_jdihn_search_url(query)),
+        ]
+    else:
+        search_targets = [
+            ("JDIH BPK", _build_bpk_search_url(query)),
+            ("JDIHN", _build_jdihn_search_url(query)),
+        ]
 
     for source_label, search_url in search_targets:
         logger.info(
