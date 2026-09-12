@@ -42,6 +42,14 @@ def _build_bpk_search_url(query: str) -> str:
     return f"https://peraturan.bpk.go.id/Search?query={quote(query)}"
 
 
+def _build_jdihn_search_url(query: str) -> str:
+    """Build a controlled JDIHN search URL using its public search page."""
+    return (
+        "https://jdihn.go.id/pencarian?instansi=&jenis="
+        f"&keyword={quote(query)}&nomor=&status=&tahun="
+    )
+
+
 def _extract_title(html: str) -> str:
     match = re.search(r"<title[^>]*>(.*?)</title>", html, re.I | re.S)
     if not match:
@@ -176,8 +184,10 @@ def search_external_regulations(
     """
     Search controlled external regulatory sources.
 
-    V6.1 intentionally uses the official JDIH BPK search endpoint only.
-    Results are metadata/snippets; no content is inserted into the RAG.
+    Search official Tier-1 regulatory sources in priority order. JDIH BPK
+    is attempted first; JDIHN is used as a fallback when BPK is unavailable
+    from the deployment environment. Results are metadata/snippets; no
+    content is inserted into the RAG.
     """
     query = str(query or "").strip()
     max_results = max(1, min(int(max_results), 10))
@@ -185,82 +195,108 @@ def search_external_regulations(
     if not query:
         return []
 
-    search_url = _build_bpk_search_url(query)
-    logger.info(
-        "External regulation search started: query_chars=%d max_results=%d url=%s",
-        len(query),
-        max_results,
-        search_url,
-    )
+    # Try BPK first because it is the primary source in V6.1. If the
+    # deployment environment is denied access (for example HTTP 403),
+    # fall back to JDIHN, which is also an allowlisted Tier-1 official source.
+    search_targets = [
+        ("JDIH BPK", _build_bpk_search_url(query)),
+        ("JDIHN", _build_jdihn_search_url(query)),
+    ]
 
-    try:
-        html = _fetch(search_url)
-    except HTTPError as exc:
-        logger.warning(
-            "External regulation search HTTP error: code=%s reason=%s url=%s",
-            exc.code,
-            exc.reason,
+    for source_label, search_url in search_targets:
+        logger.info(
+            "External regulation search started: source=%s query_chars=%d max_results=%d url=%s",
+            source_label,
+            len(query),
+            max_results,
             search_url,
         )
-        return []
-    except URLError as exc:
-        logger.warning(
-            "External regulation search URL error: reason=%s url=%s",
-            exc.reason,
-            search_url,
-        )
-        return []
-    except (TimeoutError, ValueError) as exc:
-        logger.warning(
-            "External regulation search error: type=%s detail=%s url=%s",
-            type(exc).__name__,
-            exc,
-            search_url,
-        )
-        return []
 
-    if not html:
-        logger.warning(
-            "External regulation search returned empty HTML: url=%s", search_url)
-        return []
+        try:
+            html = _fetch(search_url)
+        except HTTPError as exc:
+            logger.warning(
+                "External regulation search HTTP error: source=%s code=%s reason=%s url=%s",
+                source_label,
+                exc.code,
+                exc.reason,
+                search_url,
+            )
+            continue
+        except URLError as exc:
+            logger.warning(
+                "External regulation search URL error: source=%s reason=%s url=%s",
+                source_label,
+                exc.reason,
+                search_url,
+            )
+            continue
+        except (TimeoutError, ValueError) as exc:
+            logger.warning(
+                "External regulation search error: source=%s type=%s detail=%s url=%s",
+                source_label,
+                type(exc).__name__,
+                exc,
+                search_url,
+            )
+            continue
 
-    title = _extract_title(html)
-    text = _strip_html(html)
+        if not html:
+            logger.warning(
+                "External regulation search returned empty HTML: source=%s url=%s",
+                source_label,
+                search_url,
+            )
+            continue
 
-    # V6.1 keeps extraction deliberately conservative. If the page structure
-    # changes, returning a controlled search-page result is safer than
-    # fabricating individual regulations.
-    domain = _normalize_domain(search_url)
-    source = OFFICIAL_DOMAINS.get(domain)
+        title = _extract_title(html)
+        text = _strip_html(html)
 
-    if not source:
-        return []
+        # Keep extraction deliberately conservative. Returning a controlled
+        # search-page result is safer than fabricating individual regulations.
+        domain = _normalize_domain(search_url)
+        source = OFFICIAL_DOMAINS.get(domain)
 
-    snippet = text[:1000]
-    if not snippet:
-        logger.warning(
-            "External regulation search produced empty text: title=%s url=%s",
+        if not source:
+            logger.warning(
+                "External regulation search domain is not allowlisted: url=%s",
+                search_url,
+            )
+            continue
+
+        snippet = text[:1000]
+        if not snippet:
+            logger.warning(
+                "External regulation search produced empty text: source=%s title=%s url=%s",
+                source_label,
+                title,
+                search_url,
+            )
+            continue
+
+        logger.info(
+            "External regulation search produced search-page evidence: source=%s title=%s snippet_chars=%d",
+            source_label,
             title,
-            search_url,
+            len(snippet),
         )
-        return []
 
-    logger.info(
-        "External regulation search produced search-page evidence: title=%s snippet_chars=%d",
-        title,
-        len(snippet),
+        return [
+            {
+                "title": title or f"Hasil pencarian regulasi: {query}",
+                "url": search_url,
+                "snippet": snippet,
+                "source_name": source["source_name"],
+                "domain": domain,
+                "source_tier": source["source_tier"],
+            }
+        ][:max_results]
+
+    logger.warning(
+        "External regulation search exhausted all official sources without a result: query=%s",
+        query,
     )
-
-    return [
-        {
-            "title": title or f"Hasil pencarian regulasi: {query}",
-            "url": search_url,
-            "snippet": snippet,
-            "source_name": source["source_name"],
-            "domain": domain,
-            "source_tier": source["source_tier"],
-        }
-    ][:max_results]
+    return []
 
 
 def validate_external_source(result: Dict[str, Any]) -> bool:
