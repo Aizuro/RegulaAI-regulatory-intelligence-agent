@@ -373,7 +373,7 @@ with st.sidebar:
     st.caption("Regulatory Intelligence Assistant")
     st.divider()
 
-    st.markdown("**Backend**")
+    st.markdown("**API Status**")
 
     api_is_healthy = check_api_health()
 
@@ -392,13 +392,13 @@ with st.sidebar:
 
     st.divider()
 
-    st.markdown("**Capabilities**")
-    st.caption("🔎 Regulatory research")
-    st.caption("⚖️ Regulation comparison")
-    st.caption("📊 Regulatory data analysis")
-    st.caption("📚 Source-grounded answers")
+    # st.markdown("**Capabilities**")
+    # st.caption("🔎 Regulatory research")
+    # st.caption("⚖️ Regulation comparison")
+    # st.caption("📊 Regulatory data analysis")
+    # st.caption("📚 Source-grounded answers")
 
-    st.divider()
+    # st.divider()
 
     if st.button(
         "🗑️ Clear conversation",
@@ -444,8 +444,8 @@ if not st.session_state.messages:
 
     example_questions = [
         "Apa ketentuan mengenai transaksi elektronik?",
-        "Bandingkan dua regulasi",
-        "Berapa jumlah regulasi berdasarkan sektor?",
+        "Apa perbedaan UU Nomor 1 Tahun 2024 dengan UU Nomor 3 Tahun 2024 terkait transaksi elektronik?",
+        "Bagaimana ketentuan mengenai hak warga negara dalam UUD 1945?",
     ]
 
     for col, question in zip([col1, col2, col3], example_questions):
