@@ -11,10 +11,14 @@ from typing import Any, Dict, List
 from urllib.parse import quote, urlparse
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
+import logging
 import re
 
 
 # Official / trusted regulatory domains. Keep this allowlist conservative.
+logger = logging.getLogger(__name__)
+
+
 OFFICIAL_DOMAINS = {
     "peraturan.bpk.go.id": {
         "source_name": "JDIH BPK",
@@ -22,10 +26,6 @@ OFFICIAL_DOMAINS = {
     },
     "jdihn.go.id": {
         "source_name": "JDIHN",
-        "source_tier": 1,
-    },
-    "jdih.kemenkeu.go.id": {
-        "source_name": "JDIH Kementerian Keuangan",
         "source_tier": 1,
     },
 }
@@ -40,31 +40,6 @@ def _normalize_domain(url: str) -> str:
 def _build_bpk_search_url(query: str) -> str:
     """Build a controlled JDIH BPK search URL."""
     return f"https://peraturan.bpk.go.id/Search?query={quote(query)}"
-
-
-def _build_jdihn_search_url(query: str) -> str:
-    """Build a controlled JDIHN search URL using its public search page."""
-    return (
-        "https://jdihn.go.id/pencarian?instansi=&jenis="
-        f"&keyword={quote(query)}&nomor=&status=&tahun="
-    )
-
-
-def _build_kemenkeu_perpres_url(number: str, year: str) -> str:
-    """Build the canonical JDIH Kemenkeu page for a Perpres."""
-    return f"https://jdih.kemenkeu.go.id/dok/perpres-{number}-tahun-{year}/overview"
-
-
-def _extract_perpres_reference(query: str):
-    """Extract an explicit Perpres number/year from a user query."""
-    match = re.search(
-        r"Peraturan\s+Presiden\s+Nomor\s+(\d+)\s+Tahun\s+(\d{4})",
-        query,
-        flags=re.IGNORECASE,
-    )
-    if not match:
-        return None
-    return match.group(1), match.group(2)
 
 
 def _extract_title(html: str) -> str:
@@ -91,12 +66,23 @@ def _fetch(url: str, timeout: int = 10) -> str:
         },
     )
 
+    logger.info("External research fetch: url=%s", url)
 
     with urlopen(request, timeout=timeout) as response:
         content_type = response.headers.get("Content-Type", "")
+        logger.info(
+            "External research response: status=%s content_type=%s",
+            getattr(response, "status", "unknown"),
+            content_type,
+        )
         if "text/html" not in content_type.lower():
+            logger.warning(
+                "External research skipped non-HTML response: content_type=%s",
+                content_type,
+            )
             return ""
         body = response.read().decode("utf-8", errors="replace")
+        logger.info("External research body received: chars=%d", len(body))
         return body
 
 
@@ -124,18 +110,35 @@ def fetch_external_source(
     try:
         html = _fetch(url, timeout=timeout)
     except HTTPError as exc:
+        logger.warning(
+            "External source HTTP error: code=%s reason=%s url=%s",
+            exc.code,
+            exc.reason,
+            url,
+        )
         return {
             "status": "fetch_failed",
             "source": result,
             "evidence": "",
         }
     except URLError as exc:
+        logger.warning(
+            "External source URL error: reason=%s url=%s",
+            exc.reason,
+            url,
+        )
         return {
             "status": "fetch_failed",
             "source": result,
             "evidence": "",
         }
     except (TimeoutError, ValueError) as exc:
+        logger.warning(
+            "External source fetch error: type=%s detail=%s url=%s",
+            type(exc).__name__,
+            exc,
+            url,
+        )
         return {
             "status": "fetch_failed",
             "source": result,
@@ -173,10 +176,8 @@ def search_external_regulations(
     """
     Search controlled external regulatory sources.
 
-    Search official Tier-1 regulatory sources in priority order. For an
-    explicit Perpres reference, use the canonical JDIH Kementerian Keuangan
-    page first; BPK and JDIHN remain fallbacks for broader searches. Results
-    are metadata/snippets; no content is inserted into the RAG.
+    V6.1 intentionally uses the official JDIH BPK search endpoint only.
+    Results are metadata/snippets; no content is inserted into the RAG.
     """
     query = str(query or "").strip()
     max_results = max(1, min(int(max_results), 10))
@@ -184,68 +185,82 @@ def search_external_regulations(
     if not query:
         return []
 
-    # Prefer a deterministic official page when the query explicitly names
-    # a Perpres. This avoids relying on search-page endpoints that may be
-    # blocked by the cloud deployment environment.
-    perpres_reference = _extract_perpres_reference(query)
-    if perpres_reference:
-        number, year = perpres_reference
-        search_targets = [
-            (
-                "JDIH Kementerian Keuangan",
-                _build_kemenkeu_perpres_url(number, year),
-            ),
-            ("JDIH BPK", _build_bpk_search_url(query)),
-            ("JDIHN", _build_jdihn_search_url(query)),
-        ]
-    else:
-        search_targets = [
-            ("JDIH BPK", _build_bpk_search_url(query)),
-            ("JDIHN", _build_jdihn_search_url(query)),
-        ]
+    search_url = _build_bpk_search_url(query)
+    logger.info(
+        "External regulation search started: query_chars=%d max_results=%d url=%s",
+        len(query),
+        max_results,
+        search_url,
+    )
 
-    for source_label, search_url in search_targets:
+    try:
+        html = _fetch(search_url)
+    except HTTPError as exc:
+        logger.warning(
+            "External regulation search HTTP error: code=%s reason=%s url=%s",
+            exc.code,
+            exc.reason,
+            search_url,
+        )
+        return []
+    except URLError as exc:
+        logger.warning(
+            "External regulation search URL error: reason=%s url=%s",
+            exc.reason,
+            search_url,
+        )
+        return []
+    except (TimeoutError, ValueError) as exc:
+        logger.warning(
+            "External regulation search error: type=%s detail=%s url=%s",
+            type(exc).__name__,
+            exc,
+            search_url,
+        )
+        return []
 
-        try:
-            html = _fetch(search_url)
-        except HTTPError as exc:
-            continue
-        except URLError as exc:
-            continue
-        except (TimeoutError, ValueError) as exc:
-            continue
+    if not html:
+        logger.warning(
+            "External regulation search returned empty HTML: url=%s", search_url)
+        return []
 
-        if not html:
-            continue
+    title = _extract_title(html)
+    text = _strip_html(html)
 
-        title = _extract_title(html)
-        text = _strip_html(html)
+    # V6.1 keeps extraction deliberately conservative. If the page structure
+    # changes, returning a controlled search-page result is safer than
+    # fabricating individual regulations.
+    domain = _normalize_domain(search_url)
+    source = OFFICIAL_DOMAINS.get(domain)
 
-        # Keep extraction deliberately conservative. Returning a controlled
-        # search-page result is safer than fabricating individual regulations.
-        domain = _normalize_domain(search_url)
-        source = OFFICIAL_DOMAINS.get(domain)
+    if not source:
+        return []
 
-        if not source:
-            continue
+    snippet = text[:1000]
+    if not snippet:
+        logger.warning(
+            "External regulation search produced empty text: title=%s url=%s",
+            title,
+            search_url,
+        )
+        return []
 
-        snippet = text[:1000]
-        if not snippet:
-            continue
+    logger.info(
+        "External regulation search produced search-page evidence: title=%s snippet_chars=%d",
+        title,
+        len(snippet),
+    )
 
-
-        return [
-            {
-                "title": title or f"Hasil pencarian regulasi: {query}",
-                "url": search_url,
-                "snippet": snippet,
-                "source_name": source["source_name"],
-                "domain": domain,
-                "source_tier": source["source_tier"],
-            }
-        ][:max_results]
-
-    return []
+    return [
+        {
+            "title": title or f"Hasil pencarian regulasi: {query}",
+            "url": search_url,
+            "snippet": snippet,
+            "source_name": source["source_name"],
+            "domain": domain,
+            "source_tier": source["source_tier"],
+        }
+    ][:max_results]
 
 
 def validate_external_source(result: Dict[str, Any]) -> bool:
