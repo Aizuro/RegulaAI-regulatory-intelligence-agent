@@ -20,15 +20,11 @@ from typing import Any, Dict, List
 from langchain.schema import Document
 from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 
-from src.llm_chain import get_llm
-from src.legal_tools import search_regulations, get_regulation, compare_regulations
-from src.comparison_engine import build_comparison_report
-from src.sql_tools import run_sql_query
-from src.external_research import (
-    search_external_regulations,
-    validate_external_results,
-    fetch_external_source,
-)
+from llm_chain import get_llm
+from legal_tools import search_regulations, get_regulation, compare_regulations
+from comparison_engine import build_comparison_report
+from sql_tools import run_sql_query
+from v84_impact_tool import analyze_regulation_impact
 
 
 SYSTEM_PROMPT = """You are a Regulatory Intelligence Agent for Indonesian
@@ -37,8 +33,6 @@ laws and regulations.
 You have two knowledge sources:
 1. Legal RAG tools for regulation text and provisions.
 2. A read-only SQL tool for structured regulatory metadata analysis.
-3. A controlled external regulatory research tool for official sources when
-   the internal knowledge base does not contain the requested regulation.
 
 Rules:
 1. Use legal tools for legal text, Pasal, Ayat, or source-document questions.
@@ -80,8 +74,41 @@ def _sql_tool_schema() -> Dict[str, Any]:
 
 
 def _tool_schemas() -> List[Dict[str, Any]]:
-    """Return V3 legal schemas plus the V4 SQL schema."""
+    """Return legal, SQL, and V8.4 impact-analysis tool schemas."""
     return [
+        {
+            "name": "analyze_regulation_impact",
+            "description": (
+                "Retrieve two regulations, compare their structural evidence, and "
+                "produce a grounded impact analysis. Use when the user explicitly "
+                "asks about the impact or implications of differences between two "
+                "regulations."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "regulation_a": {
+                        "type": "object",
+                        "properties": {
+                            "document_type": {"type": "string"},
+                            "regulation_number": {"type": "string"},
+                            "year": {"type": "string"},
+                        },
+                        "required": ["document_type", "regulation_number", "year"],
+                    },
+                    "regulation_b": {
+                        "type": "object",
+                        "properties": {
+                            "document_type": {"type": "string"},
+                            "regulation_number": {"type": "string"},
+                            "year": {"type": "string"},
+                        },
+                        "required": ["document_type", "regulation_number", "year"],
+                    },
+                },
+                "required": ["regulation_a", "regulation_b"],
+            },
+        },
         {
             "name": "search_regulations",
             "description": (
@@ -146,22 +173,6 @@ def _tool_schemas() -> List[Dict[str, Any]]:
                 "required": ["regulation_a", "regulation_b"],
             },
         },
-        {
-            "name": "search_external_regulations",
-            "description": (
-                "Search controlled external regulatory sources, prioritizing official "
-                "government legal-information sources. Use when internal legal evidence "
-                "is unavailable or insufficient. Do not use for general web search."
-            ),
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "query": {"type": "string"},
-                    "max_results": {"type": "integer", "minimum": 1, "maximum": 5},
-                },
-                "required": ["query"],
-            },
-        },
         _sql_tool_schema(),
     ]
 
@@ -222,6 +233,12 @@ def _run_tool(vectorstore, name: str, arguments: Dict[str, Any]):
             k=arguments.get("k", 5),
         )
 
+    if name == "analyze_regulation_impact":
+        return analyze_regulation_impact(
+            regulation_a=arguments["regulation_a"],
+            regulation_b=arguments["regulation_b"],
+        )
+
     if name == "compare_regulations":
         return compare_regulations(
             vectorstore,
@@ -235,23 +252,6 @@ def _run_tool(vectorstore, name: str, arguments: Dict[str, Any]):
             query=arguments["query"],
             max_rows=arguments.get("max_rows", 100),
         )
-
-    if name == "search_external_regulations":
-        search_results = search_external_regulations(
-            query=arguments["query"],
-            max_results=arguments.get("max_results", 5),
-        )
-        validated = validate_external_results(search_results)
-        fetched = []
-        for result in validated:
-            fetched_result = fetch_external_source(result)
-            if fetched_result.get("status") == "ok":
-                fetched.append(fetched_result)
-        return {
-            "status": "ok" if fetched else "no_external_evidence",
-            "results": validated,
-            "evidence": fetched,
-        }
 
     raise ValueError(f"Unknown tool: {name}")
 
@@ -328,7 +328,6 @@ class AgentState:
     missing_regulations: List[Dict[str, Any]] = field(default_factory=list)
     comparison_report: Dict[str, Any] | None = None
     sql_results: List[Dict[str, Any]] = field(default_factory=list)
-    external_research: List[Dict[str, Any]] = field(default_factory=list)
     trace: List[Dict[str, Any]] = field(default_factory=list)
 
     def add_documents(self, documents: List[Document]) -> None:
@@ -465,16 +464,14 @@ class RegulatoryIntelligenceAgent:
             question
         )
         if relationship:
-            plan = ["compare_regulations"]
             q = question.lower()
-            follow_up_terms = (
-                "dampak", "implikasi", "terhadap", "mengenai",
-                "ketentuan", "pasal", "transaksi", "elektronik",
-                "sanksi", "kewajiban", "hak", "penerapan",
+            impact_terms = (
+                "dampak", "implikasi", "pengaruh", "konsekuensi",
+                "berpengaruh", "efek",
             )
-            if any(term in q for term in follow_up_terms):
-                plan.append("semantic_follow_up")
-            return plan
+            if any(term in q for term in impact_terms):
+                return ["analyze_regulation_impact"]
+            return ["compare_regulations"]
 
         if RegulatoryIntelligenceAgent._detect_broad_uud_question(question):
             return ["search_regulations"]
@@ -494,86 +491,54 @@ class RegulatoryIntelligenceAgent:
         tool_result: Dict[str, Any] | None = None,
         comparison_report: Dict[str, Any] | None = None,
         sql_results: List[Dict[str, Any]] | None = None,
-        external_research: List[Dict[str, Any]] | None = None,
     ):
         evidence = _serialize_documents(documents)
-
-        system_prompt = """
-You are the user-facing answer synthesizer for a regulatory intelligence application.
-
-GENERAL RULES
-- Answer the user's question clearly, naturally, and concisely in Indonesian.
-- Use only the supplied legal evidence and structured results.
-- Never invent facts, legal provisions, sources, pages, or citations.
-- Do not expose internal implementation details, tool names, agent workflow,
-  routing, execution steps, internal metadata, or response timing.
-- Do not explain how the system retrieved or processed the information.
-
-REGULATORY ANSWERS
-- Explain the relevant regulation in plain Indonesian.
-- Preserve legal identifiers such as document type, number, year, Pasal, and Ayat
-  when they are supported by the evidence.
-- When a source is available, present the useful answer first and keep source
-  details separate from the main explanation.
-
-COMPARISON ANSWERS
-- When comparing regulations, use the complete regulation identifier when
-  available, including document type, number, and year.
-- For example, write "UU No. 1 Tahun 2024" and "UU No. 3 Tahun 2024".
-- Do not abbreviate them as "UU 1", "UU 3", "Regulasi A", or "Regulasi B"
-  when the complete identity is available.
-- Put the full regulation identity in the comparison title or introductory
-  sentence when useful, while keeping table headers concise and consistent.
-- Use clear terms such as "ketentuan", "pasal", "fokus pengaturan",
-  "perbedaan utama", and "ringkasan".
-- Do not expose internal comparison fields such as only_in_a, only_in_b,
-  aligned_provisions, comparison_ready, structural_comparison, or similarity.
-- Do not expose retrieval metadata such as document/chunk counts or internal
-  page counts.
-- Never output HTML tags such as <br>.
-- Do not use "provinsi" to mean a legal provision.
-- Do not claim that a provision is absent from a regulation merely because it
-  was not found in retrieved evidence. If evidence is incomplete, state the
-  limitation clearly.
-
-STRUCTURED DATA / SQL ANSWERS
-- Present the useful result directly in plain language or a clean table.
-- Do not mention SQL, SQL queries, database implementation, or dataset
-  processing unless the user explicitly asks about the technical process.
-- Do not expose raw SQL, schema details, tool output, or execution details.
-
-MISSING REGULATION
-- If the requested regulation is not available in the legal knowledge base,
-  say this directly and specifically.
-- Prefer wording such as:
-  "Maaf, informasi mengenai Peraturan Presiden Nomor 99 Tahun 2099 tidak
-  tersedia dalam basis pengetahuan Regula."
-- Do not say that you failed to understand the question when the regulation
-  identifier is clear.
-- Do not invent an answer for an unavailable regulation.
-
-SOURCE LIMITATIONS
-- Be transparent when the available evidence is incomplete.
-- Do not imply that retrieved evidence represents the complete text of a
-  regulation unless the supplied evidence supports that claim.
-""".strip()
-
-        human_prompt = (
-            f"Question: {question}\n\n"
-            f"Tool result: {json.dumps(tool_result or {}, ensure_ascii=False, default=str)}\n\n"
-            f"Structured comparison report: "
-            f"{json.dumps(comparison_report or {}, ensure_ascii=False, default=str)}\n\n"
-            f"SQL results: "
-            f"{json.dumps(sql_results or [], ensure_ascii=False, default=str)}\n\n"
-            f"External research evidence: "
-            f"{json.dumps(external_research or [], ensure_ascii=False, default=str)}\n\n"
-            f"Legal evidence: "
-            f"{json.dumps(evidence, ensure_ascii=False, default=str)}"
-        )
-
         return [
-            SystemMessage(content=system_prompt),
-            HumanMessage(content=human_prompt),
+            SystemMessage(content=(
+                "You are the user-facing answer synthesizer for a regulatory "
+                "intelligence application. Answer the user's question clearly and "
+                "concisely using only the supplied evidence and structured results. "
+                "Never invent facts. Do not expose internal implementation details, "
+                "tool names, agent workflow, routing, execution steps, raw SQL, SQL "
+                "queries, database/schema details, internal metadata, or response "
+                "timing. Do not say that the answer was produced from an SQL query "
+                "or describe how the system obtained the data. For structured-data "
+                "questions, present the useful result directly as prose or a clean "
+                "table when appropriate. The SQL dataset is synthetic metadata, "
+                "not authoritative legal text. If a source is unavailable, say so "
+                "briefly and clearly. When answering comparison questions, write for "
+                "a non-technical user. Use natural Indonesian labels such as "
+                "'Regulasi A' and 'Regulasi B'. Present only information that helps "
+                "the user understand the substantive comparison. Do not expose "
+                "retrieval metadata such as jumlah dokumen/chunks, page counts used "
+                "internally, tool output, or comparison-engine statistics. Do not "
+                "expose internal field names such as only_in_a, only_in_b, "
+                "aligned_provisions, comparison_ready, structural_comparison, or "
+                "similarity. Translate those concepts into plain language when they "
+                "are useful, for example 'ketentuan yang ditemukan pada Regulasi A' "
+                "or 'ketentuan yang ditemukan pada kedua sumber'. Do not present "
+                "technical counts unless the user explicitly asks for them. Never "
+                "output HTML tags such as <br>. Prefer concise Markdown lists or "
+                "tables with readable Indonesian headings such as 'Fokus pengaturan', "
+                "'Ketentuan yang relevan', 'Perbedaan utama', and 'Ringkasan'. Avoid "
+                "the word 'provisi' when 'ketentuan' or 'pasal' is clearer. Never "
+                "invent a similarity, thematic relationship, or legal conclusion "
+                "that is not supported by the supplied evidence. Do not claim that "
+                "a provision is absent from a regulation merely because it was not "
+                "found in retrieved evidence; when evidence is incomplete, describe "
+                "the limitation explicitly. In regulatory comparisons, do not use "
+                "'provinsi' to mean a legal provision; use 'ketentuan' or 'pasal'."
+            )),
+            HumanMessage(content=(
+                f"Question: {question}\n\n"
+                f"Tool result: {json.dumps(tool_result or {}, ensure_ascii=False, default=str)}\n\n"
+                f"Structured comparison report: "
+                f"{json.dumps(comparison_report or {}, ensure_ascii=False, default=str)}\n\n"
+                f"SQL results: "
+                f"{json.dumps(sql_results or [], ensure_ascii=False, default=str)}\n\n"
+                f"Legal evidence: "
+                f"{json.dumps(evidence, ensure_ascii=False, default=str)}"
+            )),
         ]
 
     def _record_step(
@@ -610,10 +575,6 @@ SOURCE LIMITATIONS
 
         if tool == "run_sql_query":
             state.sql_results.append(normalized)
-
-        if tool == "search_external_regulations":
-            state.external_research.extend(
-                normalized.get("evidence", []) or [])
 
         state.trace.append({
             "round": round_number,
@@ -681,40 +642,6 @@ SOURCE LIMITATIONS
 
         return selected
 
-    def _build_external_citations(
-        self, external_research: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
-        """Build user-facing citations for externally retrieved evidence."""
-        citations = []
-        seen_urls = set()
-
-        for item in external_research or []:
-            if not isinstance(item, dict):
-                continue
-
-            source = item.get("source") or {}
-            if not isinstance(source, dict):
-                continue
-
-            url = str(source.get("url") or "").strip()
-            if not url or url in seen_urls:
-                continue
-
-            if not url.startswith("https://"):
-                continue
-
-            seen_urls.add(url)
-            citations.append({
-                "title": source.get("title") or "External regulatory source",
-                "url": url,
-                "source_name": source.get("source_name") or "",
-                "domain": source.get("domain") or "",
-                "source_tier": source.get("source_tier"),
-                "evidence": str(item.get("evidence") or "")[:1200],
-            })
-
-        return citations
-
     def _finalize(
         self,
         question: str,
@@ -732,6 +659,7 @@ SOURCE LIMITATIONS
                 "missing_regulations",
                 "regulation_a",
                 "regulation_b",
+                "impact",
             ):
                 if key in tool_result:
                     control_result[key] = tool_result[key]
@@ -742,7 +670,6 @@ SOURCE LIMITATIONS
             control_result,
             state.comparison_report,
             state.sql_results,
-            state.external_research,
         )
 
         final_response = self.llm.invoke(final_messages)
@@ -757,15 +684,6 @@ SOURCE LIMITATIONS
             "missing_regulations": state.missing_regulations,
             "comparison": state.comparison_report,
             "sql_results": state.sql_results,
-            "external_research": state.external_research,
-            "external_sources": [
-                item.get("source", {})
-                for item in state.external_research
-                if isinstance(item, dict)
-            ],
-            "external_citations": self._build_external_citations(
-                state.external_research
-            ),
         }
 
     def invoke(self, question: str) -> Dict[str, Any]:
@@ -780,6 +698,22 @@ SOURCE LIMITATIONS
         ]
 
         relationship_args = self._detect_two_regulation_relationship(question)
+
+        if relationship_args and state.plan == ["analyze_regulation_impact"]:
+            result = _run_tool(
+                self.vectorstore,
+                "analyze_regulation_impact",
+                relationship_args,
+            )
+            normalized = self._record_step(
+                state,
+                round_number=1,
+                tool="analyze_regulation_impact",
+                arguments=relationship_args,
+                result=result,
+            )
+            state.comparison_report = normalized.get("comparison")
+            return self._finalize(question, state, normalized)
 
         if relationship_args:
             result = _run_tool(
@@ -843,22 +777,6 @@ SOURCE LIMITATIONS
                 arguments=explicit_regulation,
                 result=result,
             )
-
-            if normalized.get("status") == "missing_source":
-                external_query = question
-                external_result = _run_tool(
-                    self.vectorstore,
-                    "search_external_regulations",
-                    {"query": external_query, "max_results": 5},
-                )
-                normalized = self._record_step(
-                    state,
-                    round_number=2,
-                    tool="search_external_regulations",
-                    arguments={"query": external_query, "max_results": 5},
-                    result=external_result,
-                )
-
             return self._finalize(question, state, normalized)
 
         if self._detect_sql_question(question):
@@ -901,15 +819,6 @@ SOURCE LIMITATIONS
                     "missing_regulations": state.missing_regulations,
                     "comparison": state.comparison_report,
                     "sql_results": state.sql_results,
-                    "external_research": state.external_research,
-                    "external_sources": [
-                        item.get("source", {})
-                        for item in state.external_research
-                        if isinstance(item, dict)
-                    ],
-                    "external_citations": self._build_external_citations(
-                        state.external_research
-                    ),
                 }
 
             messages.append(response)
