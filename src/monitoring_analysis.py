@@ -92,7 +92,14 @@ def _build_prompt(event: MonitoringEvent, regulation: Dict[str, Any], previous_r
         SYSTEM_PROMPT
         + "\nDATA MONITORING:\n"
         + json.dumps(payload, ensure_ascii=False, indent=2)
-        + "\n\nKembalikan hasil sesuai schema terstruktur yang diminta."
+        + "\n\nKembalikan HANYA satu JSON object yang valid, tanpa markdown code fence "
+        "dan tanpa teks sebelum atau sesudah JSON.\n"
+        "Gunakan field berikut:\n"
+        '{"relevance":"unknown|low|medium|high",'
+        '"summary":"string",'
+        '"key_points":["string"],'
+        '"impact":"string",'
+        '"should_notify":true}'
     )
 
 
@@ -113,12 +120,39 @@ def analyze_monitoring_event(
         )
 
     model = llm or get_llm()
-    structured_model = model.with_structured_output(MonitoringAnalysis)
     prompt = _build_prompt(event, regulation, previous_regulation)
 
-    result = structured_model.invoke(prompt)
+    result = model.invoke(prompt)
 
-    if isinstance(result, MonitoringAnalysis):
-        return result
+    if hasattr(result, "content"):
+        content = result.content
+    else:
+        content = result
 
-    return MonitoringAnalysis.model_validate(result)
+    if not isinstance(content, str):
+        raise ValueError(
+            f"LLM monitoring analysis harus berupa JSON string, "
+            f"mendapatkan {type(content).__name__}."
+        )
+
+    content = content.strip()
+
+    if content.startswith("```"):
+        lines = content.splitlines()
+
+        if lines and lines[0].startswith("```"):
+            lines = lines[1:]
+
+        if lines and lines[-1].strip() == "```":
+            lines = lines[:-1]
+
+        content = "\n".join(lines).strip()
+
+    try:
+        parsed = json.loads(content)
+    except json.JSONDecodeError as exc:
+        raise ValueError(
+            f"LLM mengembalikan JSON monitoring yang tidak valid: {exc}"
+        ) from exc
+
+    return MonitoringAnalysis.model_validate(parsed)    
