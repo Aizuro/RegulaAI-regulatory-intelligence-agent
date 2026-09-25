@@ -21,6 +21,12 @@ from src.agent_orchestrator import build_agent
 from src.monitoring import build_monitoring_contract, detect_changes
 from src.monitoring_state import MonitoringStateStore
 from src.monitoring_analysis import analyze_monitoring_event
+from src.v84_impact_tool import analyze_regulation_impact
+from src.cache import (
+    build_query_cache_key,
+    get_cache,
+    set_cache,
+)
 
 
 app = FastAPI(
@@ -127,6 +133,11 @@ class MonitorSnapshotResponse(BaseModel):
     events: List[MonitorChangeEvent] = Field(default_factory=list)
 
 
+class MonitorImpactRequest(BaseModel):
+    regulation_a: Dict[str, str]
+    regulation_b: Dict[str, str]
+
+
 def get_monitoring_state_store() -> MonitoringStateStore:
     """Return the persistent monitoring store used by the API."""
     database_path = os.getenv(
@@ -183,6 +194,16 @@ def query(request: QueryRequest) -> QueryResponse:
             detail="question tidak boleh kosong.",
         )
 
+    # Build deterministic cache key from normalized question.
+    cache_key = build_query_cache_key(question)
+
+    # Cache HIT
+    cached_result = get_cache("query", cache_key)
+
+    if cached_result is not None:
+        return QueryResponse.model_validate(cached_result)
+
+    # Cache MISS → execute the agent normally.
     try:
         result = get_agent().invoke(question)
     except Exception as exc:
@@ -191,7 +212,7 @@ def query(request: QueryRequest) -> QueryResponse:
             detail=f"Agent execution failed: {type(exc).__name__}: {exc}",
         ) from exc
 
-    return QueryResponse(
+    response = QueryResponse(
         answer=str(result.get("answer", "")),
         sources=[
             serialize_source(doc)
@@ -206,6 +227,15 @@ def query(request: QueryRequest) -> QueryResponse:
         external_sources=result.get("external_sources", []),
         external_citations=result.get("external_citations", []),
     )
+
+    # Store only successful responses in Redis.
+    set_cache(
+        "query",
+        cache_key,
+        response.model_dump(mode="json"),
+    )
+
+    return response
 
 
 @app.post(
@@ -284,3 +314,25 @@ def monitor_analyze(
         regulation_key=contract["regulation_key"],
         event=contract["event"],
     )
+
+
+@app.post("/monitor/analyze-impact")
+def monitor_analyze_impact(
+    request: MonitorImpactRequest,
+) -> Dict[str, Any]:
+    """Run V8.1 -> V8.2 -> V8.3 impact analysis for monitoring automation."""
+    try:
+        result = analyze_regulation_impact(
+            regulation_a=request.regulation_a,
+            regulation_b=request.regulation_b,
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Impact analysis failed: {type(exc).__name__}: {exc}",
+        ) from exc
+
+    return {
+        "status": "ok",
+        **result,
+    }
