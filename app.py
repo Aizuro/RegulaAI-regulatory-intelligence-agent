@@ -387,8 +387,6 @@ with st.sidebar:
             '<p class="status-error">● API unavailable</p>',
             unsafe_allow_html=True,
         )
-        st.caption("Start FastAPI with:")
-        st.code("uvicorn src.api:app --reload")
 
     st.divider()
 
