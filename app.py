@@ -399,7 +399,7 @@ with st.sidebar:
     # st.divider()
 
     if st.button(
-        "🗑️ Clear conversation",
+        "Clear conversation",
         use_container_width=True,
         type="secondary",
     ):
