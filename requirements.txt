@@ -10,6 +10,9 @@ langchain-groq==0.3.2
 # === VECTOR DATABASE ===
 chromadb>=1.0.9
 
+# === SHORT-TERM MEMORY ===
+redis==8.1.0
+
 # === DOCUMENT PROCESSING ===
 pypdf==5.4.0
 pymupdf>=1.24.0
