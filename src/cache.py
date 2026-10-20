@@ -1,9 +1,12 @@
 from typing import Any
 import json
 import hashlib
+import logging
 
 from src.redis_client import redis_client
 
+
+logger = logging.getLogger(__name__)
 
 DEFAULT_TTL = 3600
 
@@ -15,12 +18,14 @@ def build_cache_key(namespace: str, key: str) -> str:
 def get_cache(namespace: str, key: str) -> Any | None:
     cache_key = build_cache_key(namespace, key)
 
-    value = redis_client.get(cache_key)
-
-    if value is None:
+    try:
+        value = redis_client.get(cache_key)
+        if value is None:
+            return None
+        return json.loads(value)
+    except Exception as e:
+        logger.warning("get_cache gagal, lanjut tanpa cache: %s", e)
         return None
-
-    return json.loads(value)
 
 
 def set_cache(
@@ -31,17 +36,19 @@ def set_cache(
 ) -> None:
     cache_key = build_cache_key(namespace, key)
 
-    redis_client.set(
-        cache_key,
-        json.dumps(value),
-        ex=ttl,
-    )
+    try:
+        redis_client.set(cache_key, json.dumps(value), ex=ttl)
+    except Exception as e:
+        logger.warning("set_cache gagal: %s", e)
 
 
 def delete_cache(namespace: str, key: str) -> None:
     cache_key = build_cache_key(namespace, key)
 
-    redis_client.delete(cache_key)
+    try:
+        redis_client.delete(cache_key)
+    except Exception as e:
+        logger.warning("delete_cache gagal: %s", e)
 
 
 def build_query_cache_key(question: str) -> str:
