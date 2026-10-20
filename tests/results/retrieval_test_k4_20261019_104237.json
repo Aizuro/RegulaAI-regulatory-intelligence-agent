@@ -1,0 +1,2924 @@
+{
+  "timestamp": "2026-10-19T10:41:28",
+  "split": "test",
+  "k": 4,
+  "n_questions": 24,
+  "modes": {
+    "legal": {
+      "summary": {
+        "n": 24,
+        "recall_at_1": 0.875,
+        "recall_at_4": 1.0,
+        "mrr": 0.9306,
+        "doc_precision_at_4": 1.0,
+        "chunk_precision_at_4": 0.3333
+      },
+      "items": [
+        {
+          "id": "R02",
+          "question": "Apa bunyi ketentuan UUD 1945 tentang hak untuk berkomunikasi dan memperoleh informasi?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "uud1945.pdf",
+              "page": 16,
+              "pasal": "28F",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 13,
+              "pasal": "18",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 15,
+              "pasal": "26",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 6,
+              "pasal": "23",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R03",
+          "question": "Dalam kondisi apa Presiden dan/atau Wakil Presiden dapat diberhentikan dalam masa jabatannya?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "uud1945.pdf",
+              "page": 20,
+              "pasal": "7A",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 20,
+              "pasal": "7B",
+              "ayat": "5",
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 27,
+              "pasal": "8",
+              "ayat": "3",
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 3,
+              "pasal": "8",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R04",
+          "question": "Bagaimana UUD 1945 mengatur kedudukan warga negara di dalam hukum dan pemerintahan?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "uud1945.pdf",
+              "page": 7,
+              "pasal": "27",
+              "ayat": "1",
+              "relevant": true
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 15,
+              "pasal": "28D",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 15,
+              "pasal": "26",
+              "ayat": "3",
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 7,
+              "pasal": "31",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R06",
+          "question": "Apa kewajiban pemerintah terkait pendidikan dasar menurut UUD 1945?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "uud1945.pdf",
+              "page": 28,
+              "pasal": "31",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 7,
+              "pasal": "31",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 28,
+              "pasal": "31",
+              "ayat": "4",
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 29,
+              "pasal": "34",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R07",
+          "question": "Siapa yang menguasai bumi, air, dan kekayaan alam menurut UUD 1945?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "uud1945.pdf",
+              "page": 8,
+              "pasal": "33",
+              "ayat": "3",
+              "relevant": true
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 19,
+              "pasal": "36C",
+              "ayat": "4",
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 24,
+              "pasal": "24C",
+              "ayat": "6",
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 1,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R08",
+          "question": "Bagaimana UUD 1945 menjelaskan sifat kekuasaan kehakiman?",
+          "recall_at_1": false,
+          "recall_at_k": true,
+          "mrr": 0.5,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 2,
+          "retrieved": [
+            {
+              "source": "uud1945.pdf",
+              "page": 6,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 23,
+              "pasal": "24",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 6,
+              "pasal": "24",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 24,
+              "pasal": "24B",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R10",
+          "question": "Apa larangan menyiarkan atau mendistribusikan informasi elektronik yang melanggar kesusilaan?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.75,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu001.pdf",
+              "page": 8,
+              "pasal": "27",
+              "ayat": "1",
+              "relevant": true
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 31,
+              "pasal": "27",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 16,
+              "pasal": "45",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 11,
+              "pasal": "40",
+              "ayat": "2a",
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R11",
+          "question": "Apa wewenang pemerintah untuk melakukan pemutusan akses terhadap informasi elektronik yang melanggar hukum?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu001.pdf",
+              "page": 11,
+              "pasal": "40",
+              "ayat": "2b",
+              "relevant": true
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 11,
+              "pasal": "40",
+              "ayat": "2a",
+              "relevant": false
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 11,
+              "pasal": "40",
+              "ayat": "2d",
+              "relevant": false
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 36,
+              "pasal": "43",
+              "ayat": "4",
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R12",
+          "question": "Apa kewenangan penyidik pegawai negeri sipil di bidang informasi dan transaksi elektronik?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.5,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu001.pdf",
+              "page": 14,
+              "pasal": "43",
+              "ayat": "5",
+              "relevant": true
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 13,
+              "pasal": "43",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 16,
+              "pasal": "43",
+              "ayat": "8",
+              "relevant": false
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 16,
+              "pasal": "43",
+              "ayat": "7",
+              "relevant": true
+            }
+          ]
+        },
+        {
+          "id": "R13",
+          "question": "Apa hak setiap orang terkait penyelenggara sertifikasi elektronik dan tanda tangan elektronik?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu001.pdf",
+              "page": 3,
+              "pasal": "13",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 4,
+              "pasal": "13A",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 4,
+              "pasal": "13",
+              "ayat": "6",
+              "relevant": false
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 5,
+              "pasal": "16A",
+              "ayat": "2",
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R15",
+          "question": "Berdasarkan apa desa menyelenggarakan pemerintahan dan pembangunan?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu003.pdf",
+              "page": 3,
+              "pasal": "2",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 4,
+              "pasal": "26",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 16,
+              "pasal": "79",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 17,
+              "pasal": "79",
+              "ayat": "4",
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R16",
+          "question": "Apa saja sumber pendapatan desa?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.5,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu003.pdf",
+              "page": 13,
+              "pasal": "72",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 28,
+              "pasal": "72",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 13,
+              "pasal": "67",
+              "ayat": "1",
+              "relevant": false
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 15,
+              "pasal": "72A",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R18",
+          "question": "Apa hak kepala desa dalam melaksanakan tugasnya?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu003.pdf",
+              "page": 5,
+              "pasal": "26",
+              "ayat": "3",
+              "relevant": true
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 4,
+              "pasal": "26",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 7,
+              "pasal": "27",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 23,
+              "pasal": "26",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R19",
+          "question": "Apa yang dimaksud dengan Samsat dalam Peraturan Presiden Nomor 4 Tahun 2025?",
+          "recall_at_1": false,
+          "recall_at_k": true,
+          "mrr": 0.5,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 2,
+          "retrieved": [
+            {
+              "source": "2025perpres004.pdf",
+              "page": 1,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 2,
+              "pasal": null,
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 17,
+              "pasal": "31",
+              "ayat": "1",
+              "relevant": false
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 15,
+              "pasal": "2L",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R20",
+          "question": "Apa saja cakupan registrasi dan identifikasi kendaraan bermotor?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2025perpres004.pdf",
+              "page": 6,
+              "pasal": "4",
+              "ayat": "1",
+              "relevant": true
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 9,
+              "pasal": "14",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 2,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 8,
+              "pasal": "9",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R22",
+          "question": "Sistem informasi apa yang mendukung penyelenggaraan Samsat?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2025perpres004.pdf",
+              "page": 17,
+              "pasal": "31",
+              "ayat": "1",
+              "relevant": true
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 17,
+              "pasal": "31",
+              "ayat": "3",
+              "relevant": false
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 18,
+              "pasal": "31",
+              "ayat": "5",
+              "relevant": false
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 18,
+              "pasal": "31",
+              "ayat": "6",
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R23",
+          "question": "Apa yang dimaksud dengan Provinsi Daerah Khusus Jakarta?",
+          "recall_at_1": false,
+          "recall_at_k": true,
+          "mrr": 0.3333333333333333,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 3,
+          "retrieved": [
+            {
+              "source": "2024uu002.pdf",
+              "page": 43,
+              "pasal": "73",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 5,
+              "pasal": "3",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 2,
+              "pasal": "1",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 5,
+              "pasal": "2",
+              "ayat": "1",
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R24",
+          "question": "Bagaimana wilayah Provinsi Daerah Khusus Jakarta dibagi?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu002.pdf",
+              "page": 6,
+              "pasal": "6",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 29,
+              "pasal": "35",
+              "ayat": "3",
+              "relevant": false
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 6,
+              "pasal": "5",
+              "ayat": "1",
+              "relevant": false
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 43,
+              "pasal": "73",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R26",
+          "question": "Apa tugas Dewan Kawasan Aglomerasi?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu002.pdf",
+              "page": 38,
+              "pasal": "55",
+              "ayat": "2",
+              "relevant": true
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 38,
+              "pasal": "55",
+              "ayat": "3",
+              "relevant": false
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 38,
+              "pasal": "55",
+              "ayat": "1",
+              "relevant": false
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 38,
+              "pasal": "55",
+              "ayat": "4",
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R27",
+          "question": "Siapa yang membantu Gubernur dan DPRD dalam penyelenggaraan pemerintahan Daerah Khusus Jakarta?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.5,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu002.pdf",
+              "page": 8,
+              "pasal": "12",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 7,
+              "pasal": "9",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 7,
+              "pasal": "10",
+              "ayat": "1",
+              "relevant": false
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 2,
+              "pasal": "1",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R28",
+          "question": "Apa yang diatur dalam Undang-Undang Nomor 5 Tahun 2024?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.5,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu005.pdf",
+              "page": 1,
+              "pasal": null,
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu005.pdf",
+              "page": 4,
+              "pasal": "9",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu005.pdf",
+              "page": 2,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu005.pdf",
+              "page": 3,
+              "pasal": "4",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R29",
+          "question": "Apa tugas Badan Perusahaan Produksi Bahan Makanan dan Pembukaan Tanah?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "1959uut001.pdf",
+              "page": 2,
+              "pasal": null,
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "1959uut001.pdf",
+              "page": 1,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "1959uut001.pdf",
+              "page": 6,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "1959uut001.pdf",
+              "page": 3,
+              "pasal": "3",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R30",
+          "question": "Apa yang diatur dalam Undang-Undang Darurat Nomor 3 Tahun 1959?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "1959uut003.pdf",
+              "page": 1,
+              "pasal": null,
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "1959uut003.pdf",
+              "page": 3,
+              "pasal": "1",
+              "ayat": "5",
+              "relevant": false
+            },
+            {
+              "source": "1959uut003.pdf",
+              "page": 2,
+              "pasal": "1",
+              "ayat": "3",
+              "relevant": false
+            },
+            {
+              "source": "1959uut003.pdf",
+              "page": 2,
+              "pasal": "1",
+              "ayat": "2",
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R31",
+          "question": "Apa yang diatur tentang tanda-tanda kehormatan dalam Undang-Undang Darurat Nomor 4 Tahun 1959?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.75,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "1959uut004.pdf",
+              "page": 1,
+              "pasal": null,
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "1959uut004.pdf",
+              "page": 9,
+              "pasal": null,
+              "ayat": "12",
+              "relevant": true
+            },
+            {
+              "source": "1959uut004.pdf",
+              "page": 2,
+              "pasal": null,
+              "ayat": "4",
+              "relevant": false
+            },
+            {
+              "source": "1959uut004.pdf",
+              "page": 7,
+              "pasal": null,
+              "ayat": "7",
+              "relevant": true
+            }
+          ]
+        }
+      ]
+    },
+    "mmr": {
+      "summary": {
+        "n": 24,
+        "recall_at_1": 0.8333,
+        "recall_at_4": 1.0,
+        "mrr": 0.9097,
+        "doc_precision_at_4": 0.8646,
+        "chunk_precision_at_4": 0.3125
+      },
+      "items": [
+        {
+          "id": "R02",
+          "question": "Apa bunyi ketentuan UUD 1945 tentang hak untuk berkomunikasi dan memperoleh informasi?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 0.75,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "uud1945.pdf",
+              "page": 16,
+              "pasal": "28F",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 14,
+              "pasal": "19",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 15,
+              "pasal": "26",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 7,
+              "pasal": "28",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R03",
+          "question": "Dalam kondisi apa Presiden dan/atau Wakil Presiden dapat diberhentikan dalam masa jabatannya?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "uud1945.pdf",
+              "page": 20,
+              "pasal": "7A",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 20,
+              "pasal": "7B",
+              "ayat": "5",
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 27,
+              "pasal": "8",
+              "ayat": "3",
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 3,
+              "pasal": "8",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R04",
+          "question": "Bagaimana UUD 1945 mengatur kedudukan warga negara di dalam hukum dan pemerintahan?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "uud1945.pdf",
+              "page": 7,
+              "pasal": "27",
+              "ayat": "1",
+              "relevant": true
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 15,
+              "pasal": "28D",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 15,
+              "pasal": "26",
+              "ayat": "3",
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 24,
+              "pasal": "24C",
+              "ayat": "6",
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R06",
+          "question": "Apa kewajiban pemerintah terkait pendidikan dasar menurut UUD 1945?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 0.75,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "uud1945.pdf",
+              "page": 28,
+              "pasal": "31",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 15,
+              "pasal": "26",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 12,
+              "pasal": "40",
+              "ayat": "6",
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 7,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R07",
+          "question": "Siapa yang menguasai bumi, air, dan kekayaan alam menurut UUD 1945?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 0.5,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "uud1945.pdf",
+              "page": 8,
+              "pasal": "33",
+              "ayat": "3",
+              "relevant": true
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 28,
+              "pasal": "35",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 24,
+              "pasal": "24C",
+              "ayat": "6",
+              "relevant": false
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 10,
+              "pasal": "15",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R08",
+          "question": "Bagaimana UUD 1945 menjelaskan sifat kekuasaan kehakiman?",
+          "recall_at_1": false,
+          "recall_at_k": true,
+          "mrr": 0.5,
+          "doc_precision_at_k": 0.75,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 2,
+          "retrieved": [
+            {
+              "source": "uud1945.pdf",
+              "page": 6,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 23,
+              "pasal": "24",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 24,
+              "pasal": "24C",
+              "ayat": "6",
+              "relevant": false
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 57,
+              "pasal": "45",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R10",
+          "question": "Apa larangan menyiarkan atau mendistribusikan informasi elektronik yang melanggar kesusilaan?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.75,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu001.pdf",
+              "page": 8,
+              "pasal": "27",
+              "ayat": "1",
+              "relevant": true
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 31,
+              "pasal": "27",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 16,
+              "pasal": "45",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 11,
+              "pasal": "40",
+              "ayat": "2a",
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R11",
+          "question": "Apa wewenang pemerintah untuk melakukan pemutusan akses terhadap informasi elektronik yang melanggar hukum?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu001.pdf",
+              "page": 11,
+              "pasal": "40",
+              "ayat": "2b",
+              "relevant": true
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 11,
+              "pasal": "40",
+              "ayat": "2a",
+              "relevant": false
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 11,
+              "pasal": "40",
+              "ayat": "2d",
+              "relevant": false
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 36,
+              "pasal": "43",
+              "ayat": "4",
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R12",
+          "question": "Apa kewenangan penyidik pegawai negeri sipil di bidang informasi dan transaksi elektronik?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.5,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu001.pdf",
+              "page": 14,
+              "pasal": "43",
+              "ayat": "5",
+              "relevant": true
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 13,
+              "pasal": "43",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 16,
+              "pasal": "43",
+              "ayat": "8",
+              "relevant": false
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 16,
+              "pasal": "43",
+              "ayat": "7",
+              "relevant": true
+            }
+          ]
+        },
+        {
+          "id": "R13",
+          "question": "Apa hak setiap orang terkait penyelenggara sertifikasi elektronik dan tanda tangan elektronik?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu001.pdf",
+              "page": 3,
+              "pasal": "13",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 4,
+              "pasal": "13A",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 4,
+              "pasal": "13",
+              "ayat": "6",
+              "relevant": false
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 5,
+              "pasal": "16A",
+              "ayat": "2",
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R15",
+          "question": "Berdasarkan apa desa menyelenggarakan pemerintahan dan pembangunan?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu003.pdf",
+              "page": 3,
+              "pasal": "2",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 4,
+              "pasal": "26",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 16,
+              "pasal": "79",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 17,
+              "pasal": "79",
+              "ayat": "4",
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R16",
+          "question": "Apa saja sumber pendapatan desa?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.5,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu003.pdf",
+              "page": 13,
+              "pasal": "72",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 28,
+              "pasal": "72",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 13,
+              "pasal": "67",
+              "ayat": "1",
+              "relevant": false
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 15,
+              "pasal": "72A",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R18",
+          "question": "Apa hak kepala desa dalam melaksanakan tugasnya?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu003.pdf",
+              "page": 5,
+              "pasal": "26",
+              "ayat": "3",
+              "relevant": true
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 4,
+              "pasal": "26",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 7,
+              "pasal": "27",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 23,
+              "pasal": "26",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R19",
+          "question": "Apa yang dimaksud dengan Samsat dalam Peraturan Presiden Nomor 4 Tahun 2025?",
+          "recall_at_1": false,
+          "recall_at_k": true,
+          "mrr": 0.5,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 2,
+          "retrieved": [
+            {
+              "source": "2025perpres004.pdf",
+              "page": 1,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 2,
+              "pasal": null,
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 18,
+              "pasal": "31",
+              "ayat": "5",
+              "relevant": false
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 9,
+              "pasal": "13",
+              "ayat": "3",
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R20",
+          "question": "Apa saja cakupan registrasi dan identifikasi kendaraan bermotor?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2025perpres004.pdf",
+              "page": 6,
+              "pasal": "4",
+              "ayat": "1",
+              "relevant": true
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 9,
+              "pasal": "14",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 2,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 8,
+              "pasal": "9",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R22",
+          "question": "Sistem informasi apa yang mendukung penyelenggaraan Samsat?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2025perpres004.pdf",
+              "page": 17,
+              "pasal": "31",
+              "ayat": "1",
+              "relevant": true
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 17,
+              "pasal": "31",
+              "ayat": "3",
+              "relevant": false
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 18,
+              "pasal": "31",
+              "ayat": "5",
+              "relevant": false
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 18,
+              "pasal": "31",
+              "ayat": "6",
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R23",
+          "question": "Apa yang dimaksud dengan Provinsi Daerah Khusus Jakarta?",
+          "recall_at_1": false,
+          "recall_at_k": true,
+          "mrr": 0.3333333333333333,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 3,
+          "retrieved": [
+            {
+              "source": "2024uu002.pdf",
+              "page": 43,
+              "pasal": "73",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 5,
+              "pasal": "3",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 2,
+              "pasal": "1",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 5,
+              "pasal": "2",
+              "ayat": "1",
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R24",
+          "question": "Bagaimana wilayah Provinsi Daerah Khusus Jakarta dibagi?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu002.pdf",
+              "page": 6,
+              "pasal": "6",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 29,
+              "pasal": "35",
+              "ayat": "3",
+              "relevant": false
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 6,
+              "pasal": "5",
+              "ayat": "1",
+              "relevant": false
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 43,
+              "pasal": "73",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R26",
+          "question": "Apa tugas Dewan Kawasan Aglomerasi?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu002.pdf",
+              "page": 38,
+              "pasal": "55",
+              "ayat": "2",
+              "relevant": true
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 38,
+              "pasal": "55",
+              "ayat": "3",
+              "relevant": false
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 38,
+              "pasal": "55",
+              "ayat": "1",
+              "relevant": false
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 38,
+              "pasal": "55",
+              "ayat": "4",
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R27",
+          "question": "Siapa yang membantu Gubernur dan DPRD dalam penyelenggaraan pemerintahan Daerah Khusus Jakarta?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.5,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu002.pdf",
+              "page": 8,
+              "pasal": "12",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 7,
+              "pasal": "9",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 7,
+              "pasal": "10",
+              "ayat": "1",
+              "relevant": false
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 2,
+              "pasal": "1",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R28",
+          "question": "Apa yang diatur dalam Undang-Undang Nomor 5 Tahun 2024?",
+          "recall_at_1": false,
+          "recall_at_k": true,
+          "mrr": 0.5,
+          "doc_precision_at_k": 0.25,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 2,
+          "retrieved": [
+            {
+              "source": "2024uu001.pdf",
+              "page": 3,
+              "pasal": "5",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu005.pdf",
+              "page": 1,
+              "pasal": null,
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 5,
+              "pasal": "16A",
+              "ayat": "5",
+              "relevant": false
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 20,
+              "pasal": null,
+              "ayat": "5",
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R29",
+          "question": "Apa tugas Badan Perusahaan Produksi Bahan Makanan dan Pembukaan Tanah?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "1959uut001.pdf",
+              "page": 2,
+              "pasal": null,
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "1959uut001.pdf",
+              "page": 1,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "1959uut001.pdf",
+              "page": 6,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "1959uut001.pdf",
+              "page": 3,
+              "pasal": "3",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R30",
+          "question": "Apa yang diatur dalam Undang-Undang Darurat Nomor 3 Tahun 1959?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 0.25,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "1959uut003.pdf",
+              "page": 1,
+              "pasal": null,
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "1959uut004.pdf",
+              "page": 1,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "1959uut001.pdf",
+              "page": 6,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 58,
+              "pasal": "59",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R31",
+          "question": "Apa yang diatur tentang tanda-tanda kehormatan dalam Undang-Undang Darurat Nomor 4 Tahun 1959?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 0.5,
+          "chunk_precision_at_k": 0.5,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "1959uut004.pdf",
+              "page": 1,
+              "pasal": null,
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "1959uut004.pdf",
+              "page": 9,
+              "pasal": null,
+              "ayat": "12",
+              "relevant": true
+            },
+            {
+              "source": "1959uut005.pdf",
+              "page": 1,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu005.pdf",
+              "page": 3,
+              "pasal": "4",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        }
+      ]
+    },
+    "similarity": {
+      "summary": {
+        "n": 24,
+        "recall_at_1": 0.8333,
+        "recall_at_4": 1.0,
+        "mrr": 0.9028,
+        "doc_precision_at_4": 0.8958,
+        "chunk_precision_at_4": 0.3021
+      },
+      "items": [
+        {
+          "id": "R02",
+          "question": "Apa bunyi ketentuan UUD 1945 tentang hak untuk berkomunikasi dan memperoleh informasi?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 0.5,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "uud1945.pdf",
+              "page": 16,
+              "pasal": "28F",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 14,
+              "pasal": "19",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 13,
+              "pasal": "19",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 13,
+              "pasal": "18",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R03",
+          "question": "Dalam kondisi apa Presiden dan/atau Wakil Presiden dapat diberhentikan dalam masa jabatannya?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "uud1945.pdf",
+              "page": 20,
+              "pasal": "7A",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 20,
+              "pasal": "7B",
+              "ayat": "5",
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 20,
+              "pasal": "7B",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 21,
+              "pasal": "8",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R04",
+          "question": "Bagaimana UUD 1945 mengatur kedudukan warga negara di dalam hukum dan pemerintahan?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "uud1945.pdf",
+              "page": 7,
+              "pasal": "27",
+              "ayat": "1",
+              "relevant": true
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 15,
+              "pasal": "28D",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 15,
+              "pasal": "26",
+              "ayat": "3",
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 7,
+              "pasal": "31",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R06",
+          "question": "Apa kewajiban pemerintah terkait pendidikan dasar menurut UUD 1945?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "uud1945.pdf",
+              "page": 28,
+              "pasal": "31",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 7,
+              "pasal": "31",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 28,
+              "pasal": "31",
+              "ayat": "4",
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 29,
+              "pasal": "34",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R07",
+          "question": "Siapa yang menguasai bumi, air, dan kekayaan alam menurut UUD 1945?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 0.75,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "uud1945.pdf",
+              "page": 8,
+              "pasal": "33",
+              "ayat": "3",
+              "relevant": true
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 28,
+              "pasal": "35",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 19,
+              "pasal": "36C",
+              "ayat": "4",
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 24,
+              "pasal": "24C",
+              "ayat": "6",
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R08",
+          "question": "Bagaimana UUD 1945 menjelaskan sifat kekuasaan kehakiman?",
+          "recall_at_1": false,
+          "recall_at_k": true,
+          "mrr": 0.5,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 2,
+          "retrieved": [
+            {
+              "source": "uud1945.pdf",
+              "page": 6,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 23,
+              "pasal": "24",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 6,
+              "pasal": "24",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "uud1945.pdf",
+              "page": 24,
+              "pasal": "24B",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R10",
+          "question": "Apa larangan menyiarkan atau mendistribusikan informasi elektronik yang melanggar kesusilaan?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.75,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu001.pdf",
+              "page": 8,
+              "pasal": "27",
+              "ayat": "1",
+              "relevant": true
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 31,
+              "pasal": "27",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 16,
+              "pasal": "45",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 9,
+              "pasal": "28",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R11",
+          "question": "Apa wewenang pemerintah untuk melakukan pemutusan akses terhadap informasi elektronik yang melanggar hukum?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu001.pdf",
+              "page": 11,
+              "pasal": "40",
+              "ayat": "2b",
+              "relevant": true
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 11,
+              "pasal": "40",
+              "ayat": "2a",
+              "relevant": false
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 11,
+              "pasal": "40",
+              "ayat": "2d",
+              "relevant": false
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 10,
+              "pasal": "40",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R12",
+          "question": "Apa kewenangan penyidik pegawai negeri sipil di bidang informasi dan transaksi elektronik?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu001.pdf",
+              "page": 14,
+              "pasal": "43",
+              "ayat": "5",
+              "relevant": true
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 13,
+              "pasal": "43",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 16,
+              "pasal": "43",
+              "ayat": "8",
+              "relevant": false
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 16,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R13",
+          "question": "Apa hak setiap orang terkait penyelenggara sertifikasi elektronik dan tanda tangan elektronik?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu001.pdf",
+              "page": 3,
+              "pasal": "13",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 4,
+              "pasal": "13A",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 4,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu001.pdf",
+              "page": 4,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R15",
+          "question": "Berdasarkan apa desa menyelenggarakan pemerintahan dan pembangunan?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu003.pdf",
+              "page": 3,
+              "pasal": "2",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 4,
+              "pasal": "26",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 16,
+              "pasal": "79",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 17,
+              "pasal": "79",
+              "ayat": "4",
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R16",
+          "question": "Apa saja sumber pendapatan desa?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.5,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu003.pdf",
+              "page": 13,
+              "pasal": "72",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 28,
+              "pasal": "72",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 13,
+              "pasal": "67",
+              "ayat": "1",
+              "relevant": false
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 15,
+              "pasal": "72A",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R18",
+          "question": "Apa hak kepala desa dalam melaksanakan tugasnya?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu003.pdf",
+              "page": 5,
+              "pasal": "26",
+              "ayat": "3",
+              "relevant": true
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 4,
+              "pasal": "26",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 7,
+              "pasal": "27",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu003.pdf",
+              "page": 23,
+              "pasal": "26",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R19",
+          "question": "Apa yang dimaksud dengan Samsat dalam Peraturan Presiden Nomor 4 Tahun 2025?",
+          "recall_at_1": false,
+          "recall_at_k": true,
+          "mrr": 0.5,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 2,
+          "retrieved": [
+            {
+              "source": "2025perpres004.pdf",
+              "page": 1,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 2,
+              "pasal": null,
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 17,
+              "pasal": "31",
+              "ayat": "1",
+              "relevant": false
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 15,
+              "pasal": "2L",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R20",
+          "question": "Apa saja cakupan registrasi dan identifikasi kendaraan bermotor?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2025perpres004.pdf",
+              "page": 6,
+              "pasal": "4",
+              "ayat": "1",
+              "relevant": true
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 9,
+              "pasal": "14",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 2,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 7,
+              "pasal": "7",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R22",
+          "question": "Sistem informasi apa yang mendukung penyelenggaraan Samsat?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2025perpres004.pdf",
+              "page": 17,
+              "pasal": "31",
+              "ayat": "1",
+              "relevant": true
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 17,
+              "pasal": "31",
+              "ayat": "3",
+              "relevant": false
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 18,
+              "pasal": "31",
+              "ayat": "5",
+              "relevant": false
+            },
+            {
+              "source": "2025perpres004.pdf",
+              "page": 18,
+              "pasal": "31",
+              "ayat": "6",
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R23",
+          "question": "Apa yang dimaksud dengan Provinsi Daerah Khusus Jakarta?",
+          "recall_at_1": false,
+          "recall_at_k": true,
+          "mrr": 0.3333333333333333,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 3,
+          "retrieved": [
+            {
+              "source": "2024uu002.pdf",
+              "page": 43,
+              "pasal": "73",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 5,
+              "pasal": "3",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 2,
+              "pasal": "1",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 5,
+              "pasal": "2",
+              "ayat": "1",
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R24",
+          "question": "Bagaimana wilayah Provinsi Daerah Khusus Jakarta dibagi?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu002.pdf",
+              "page": 6,
+              "pasal": "6",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 29,
+              "pasal": "35",
+              "ayat": "3",
+              "relevant": false
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 6,
+              "pasal": "5",
+              "ayat": "1",
+              "relevant": false
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 5,
+              "pasal": "3",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R26",
+          "question": "Apa tugas Dewan Kawasan Aglomerasi?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu002.pdf",
+              "page": 38,
+              "pasal": "55",
+              "ayat": "2",
+              "relevant": true
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 38,
+              "pasal": "55",
+              "ayat": "3",
+              "relevant": false
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 38,
+              "pasal": "55",
+              "ayat": "1",
+              "relevant": false
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 38,
+              "pasal": "55",
+              "ayat": "4",
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R27",
+          "question": "Siapa yang membantu Gubernur dan DPRD dalam penyelenggaraan pemerintahan Daerah Khusus Jakarta?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.5,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "2024uu002.pdf",
+              "page": 8,
+              "pasal": "12",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 7,
+              "pasal": "9",
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 7,
+              "pasal": "10",
+              "ayat": "1",
+              "relevant": false
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 2,
+              "pasal": "1",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R28",
+          "question": "Apa yang diatur dalam Undang-Undang Nomor 5 Tahun 2024?",
+          "recall_at_1": false,
+          "recall_at_k": true,
+          "mrr": 0.3333333333333333,
+          "doc_precision_at_k": 0.25,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 3,
+          "retrieved": [
+            {
+              "source": "2024uu001.pdf",
+              "page": 3,
+              "pasal": "5",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 6,
+              "pasal": "5",
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "2024uu005.pdf",
+              "page": 1,
+              "pasal": null,
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "2024uu002.pdf",
+              "page": 50,
+              "pasal": "5",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R29",
+          "question": "Apa tugas Badan Perusahaan Produksi Bahan Makanan dan Pembukaan Tanah?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 1.0,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "1959uut001.pdf",
+              "page": 2,
+              "pasal": null,
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "1959uut001.pdf",
+              "page": 1,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "1959uut001.pdf",
+              "page": 6,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "1959uut001.pdf",
+              "page": 3,
+              "pasal": "3",
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R30",
+          "question": "Apa yang diatur dalam Undang-Undang Darurat Nomor 3 Tahun 1959?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 0.5,
+          "chunk_precision_at_k": 0.25,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "1959uut003.pdf",
+              "page": 1,
+              "pasal": null,
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "1959uut003.pdf",
+              "page": 3,
+              "pasal": "1",
+              "ayat": "5",
+              "relevant": false
+            },
+            {
+              "source": "1959uut004.pdf",
+              "page": 1,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "1959uut001.pdf",
+              "page": 1,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            }
+          ]
+        },
+        {
+          "id": "R31",
+          "question": "Apa yang diatur tentang tanda-tanda kehormatan dalam Undang-Undang Darurat Nomor 4 Tahun 1959?",
+          "recall_at_1": true,
+          "recall_at_k": true,
+          "mrr": 1.0,
+          "doc_precision_at_k": 0.5,
+          "chunk_precision_at_k": 0.5,
+          "first_relevant_rank": 1,
+          "retrieved": [
+            {
+              "source": "1959uut004.pdf",
+              "page": 1,
+              "pasal": null,
+              "ayat": null,
+              "relevant": true
+            },
+            {
+              "source": "1959uut004.pdf",
+              "page": 9,
+              "pasal": null,
+              "ayat": "12",
+              "relevant": true
+            },
+            {
+              "source": "1959uut005.pdf",
+              "page": 1,
+              "pasal": null,
+              "ayat": null,
+              "relevant": false
+            },
+            {
+              "source": "1959uut005.pdf",
+              "page": 4,
+              "pasal": null,
+              "ayat": "6",
+              "relevant": false
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

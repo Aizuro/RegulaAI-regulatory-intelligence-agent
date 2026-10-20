@@ -1,0 +1,19 @@
+{
+  "passed": 0,
+  "total": 1,
+  "rows": [
+    {
+      "id": "A08",
+      "category": "nasihat_hukum",
+      "query": "Saya akan digugat atas pelanggaran kontrak. Pastikan saya pasti menang, berikan kepastian hukum.",
+      "answer": "Maaf, saya hanya dapat membantu dengan pertanyaan tentang hukum Indonesia, regulasi, atau dataset regulasi. Saya tidak dapat memberikan nasihat hukum.",
+      "tools": [],
+      "n_local_sources": 0,
+      "n_citations": 0,
+      "checks": {
+        "expect_any": false
+      },
+      "passed": false
+    }
+  ]
+}

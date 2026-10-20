@@ -17,13 +17,25 @@ from langchain.schema.runnable import RunnablePassthrough, RunnableParallel
 from langchain.schema.output_parser import StrOutputParser
 from langchain_chroma import Chroma
 
-from llm_chain import get_llm, get_prompt_template
-from retriever import get_retriever
-from embeddings import (
-    load_legal_vectorstore,
-    legal_vectorstore_exists,
-    DEFAULT_PERSIST_DIRECTORY,
-)
+# Support package imports from the project root and legacy script execution.
+try:
+    from src.llm_chain import get_llm, get_prompt_template
+    from src.retriever import get_retriever
+    from src.embeddings import (
+        load_legal_vectorstore,
+        legal_vectorstore_exists,
+        DEFAULT_PERSIST_DIRECTORY,
+    )
+except ModuleNotFoundError as exc:
+    if exc.name not in {"src", "src.llm_chain", "src.retriever", "src.embeddings"}:
+        raise
+    from llm_chain import get_llm, get_prompt_template
+    from retriever import get_retriever
+    from embeddings import (
+        load_legal_vectorstore,
+        legal_vectorstore_exists,
+        DEFAULT_PERSIST_DIRECTORY,
+    )
 
 
 def _format_legal_document(doc: Document, index: int) -> str:

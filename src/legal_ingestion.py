@@ -13,10 +13,10 @@ from typing import Any, Dict, List, Tuple, Optional
 
 from langchain.schema import Document
 
-from document_loader import load_single_pdf
-from legal_parser import enrich_documents
-from legal_chunker import chunk_legal_blocks
-from legal_chunk_cleaner import clean_legal_chunks
+from src.document_loader import load_single_pdf
+from src.legal_parser import enrich_documents
+from src.legal_chunker import chunk_legal_blocks
+from src.legal_chunk_cleaner import clean_legal_chunks
 
 
 PIPELINE_VERSION = "legal-ingestion-v1"

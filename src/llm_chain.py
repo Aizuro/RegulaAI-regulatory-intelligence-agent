@@ -2,7 +2,6 @@
 
 import os
 from dotenv import load_dotenv
-# ganti dari langchain_google_genai
 from langchain_groq import ChatGroq
 from langchain.prompts import PromptTemplate
 from langchain.schema import Document

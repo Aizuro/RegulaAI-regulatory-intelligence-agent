@@ -3,9 +3,9 @@ from __future__ import annotations
 
 from typing import Any, Dict
 
-from document_retrieval import retrieve_regulation
-from document_comparison import compare_retrieved_documents
-from impact_analysis import analyze_comparison_impact
+from src.document_retrieval import retrieve_regulation
+from src.document_comparison import compare_retrieved_documents
+from src.impact_analysis import analyze_comparison_impact
 
 
 def analyze_regulation_impact(

@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, Iterable
 
-from comparison_engine import build_comparison_report
+from src.comparison_engine import build_comparison_report
 
 
 def _serialize_document(doc: Any) -> Dict[str, Any]:

@@ -23,8 +23,8 @@ from urllib.request import Request, urlopen
 
 from langchain_core.documents import Document
 
-from embeddings import load_legal_vectorstore
-from legal_ingestion import build_legal_documents
+from src.embeddings import load_legal_vectorstore
+from src.legal_ingestion import build_legal_documents
 
 
 @dataclass

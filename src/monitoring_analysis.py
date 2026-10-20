@@ -119,40 +119,12 @@ def analyze_monitoring_event(
             "previous_regulation wajib tersedia untuk updated_regulation."
         )
 
-    model = llm or get_llm()
+    model = (llm or get_llm()).with_structured_output(MonitoringAnalysis)
     prompt = _build_prompt(event, regulation, previous_regulation)
 
     result = model.invoke(prompt)
 
-    if hasattr(result, "content"):
-        content = result.content
-    else:
-        content = result
+    if isinstance(result, MonitoringAnalysis):
+        return result
 
-    if not isinstance(content, str):
-        raise ValueError(
-            f"LLM monitoring analysis harus berupa JSON string, "
-            f"mendapatkan {type(content).__name__}."
-        )
-
-    content = content.strip()
-
-    if content.startswith("```"):
-        lines = content.splitlines()
-
-        if lines and lines[0].startswith("```"):
-            lines = lines[1:]
-
-        if lines and lines[-1].strip() == "```":
-            lines = lines[:-1]
-
-        content = "\n".join(lines).strip()
-
-    try:
-        parsed = json.loads(content)
-    except json.JSONDecodeError as exc:
-        raise ValueError(
-            f"LLM mengembalikan JSON monitoring yang tidak valid: {exc}"
-        ) from exc
-
-    return MonitoringAnalysis.model_validate(parsed)    
+    return MonitoringAnalysis.model_validate(result)

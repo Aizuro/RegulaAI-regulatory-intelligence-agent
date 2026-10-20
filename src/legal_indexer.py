@@ -2,8 +2,14 @@
 import argparse
 import sys
 
-from legal_ingestion import build_legal_documents
-from embeddings import index_legal_documents_resumable
+try:
+    from src.legal_ingestion import build_legal_documents
+    from src.embeddings import index_legal_documents_resumable
+except ModuleNotFoundError as exc:
+    if exc.name not in {"src", "src.legal_ingestion", "src.embeddings"}:
+        raise
+    from legal_ingestion import build_legal_documents
+    from embeddings import index_legal_documents_resumable
 
 DEFAULT_DOCUMENTS_PATH = "data/documents"
 DEFAULT_VECTORSTORE_PATH = "vectorstore"

@@ -1,0 +1,90 @@
+{
+  "name": "Regula V7.2.4 - Monitoring Contract",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger-v724",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [260, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "regulation-payload",
+              "name": "regulation",
+              "value": "={{ { type: 'Perpres', number: '95', year: '2018', title: 'Sistem Pemerintahan Berbasis Elektronik', url: 'https://jdih.kemenkeu.go.id/dok/perpres-95-tahun-2018/overview', source: 'JDIH', published_date: '2018-10-05' } }}",
+              "type": "object"
+            },
+            {
+              "id": "event-payload",
+              "name": "event",
+              "value": "new_regulation",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "sample-event-v724",
+      "name": "Build Monitoring Event",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.REGULA_API_BASE_URL || 'http://localhost:8000') + '/monitor/analyze' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { regulation: $json.regulation, event: $json.event } }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "call-regula-api-v724",
+      "name": "Call Regula /monitor/analyze",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [740, 300]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Build Monitoring Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Monitoring Event": {
+      "main": [
+        [
+          {
+            "node": "Call Regula /monitor/analyze",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "v7.2.4-monitoring-contract",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}

@@ -1,0 +1,64 @@
+{
+  "name": "Regula V7.2.5 - Monitoring Sync",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger-v725",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [260, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "regulations-payload",
+              "name": "regulations",
+              "value": "={{ [ { type: 'Perpres', number: '95', year: '2018', title: 'Sistem Pemerintahan Berbasis Elektronik', url: 'https://jdih.kemenkeu.go.id/dok/perpres-95-tahun-2018/overview', source: 'JDIH', published_date: '2018-10-05' } ] }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "sample-snapshot-v725",
+      "name": "Build Current Snapshot",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/monitor/sync",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { regulations: $json.regulations } }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "call-regula-sync-v725",
+      "name": "Call Regula /monitor/sync",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [760, 300]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [[{"node": "Build Current Snapshot", "type": "main", "index": 0}]]
+    },
+    "Build Current Snapshot": {
+      "main": [[{"node": "Call Regula /monitor/sync", "type": "main", "index": 0}]]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {"executionOrder": "v1"},
+  "versionId": "v7.2.5-monitoring-sync",
+  "meta": {"templateCredsSetupCompleted": true},
+  "tags": []
+}
