@@ -128,8 +128,8 @@ if "messages" not in st.session_state:
 if "api_status" not in st.session_state:
     st.session_state.api_status = None
 
-if "awaiting_answer" not in st.session_state:
-    st.session_state.awaiting_answer = False
+if "pending_question" not in st.session_state:
+    st.session_state.pending_question = None
 
 # ============================================================
 # API CLIENT
@@ -304,8 +304,7 @@ def render_agent_result(result: Dict[str, Any]) -> None:
 # CHAT
 # ============================================================
 
-def queue_question(question: str) -> None:
-    """Save the user's message and rerun right away so the layout is clean."""
+def send_question(question: str) -> None:
     question = question.strip()
 
     if not question:
@@ -317,14 +316,9 @@ def queue_question(question: str) -> None:
             "content": question,
         }
     )
-    st.session_state.awaiting_answer = True
-    st.rerun()
 
-
-def answer_last_question() -> None:
-    """Call the backend for the last user message and show the answer below it."""
-    question = st.session_state.messages[-1]["content"]
-    st.session_state.awaiting_answer = False
+    with st.chat_message("user"):
+        st.markdown(question)
 
     with st.chat_message("assistant"):
         with st.spinner("Analyzing regulation..."):
@@ -333,6 +327,8 @@ def answer_last_question() -> None:
             try:
                 result = query_agent(question)
                 elapsed = time.time() - start_time
+
+                render_agent_result(result)
 
                 st.session_state.messages.append(
                     {
@@ -349,22 +345,26 @@ def answer_last_question() -> None:
                     "Pastikan FastAPI berjalan di "
                     f"`{API_URL}`."
                 )
+                st.error(message)
+                st.caption(str(exc))
+
                 st.session_state.messages.append(
                     {
                         "role": "assistant",
-                        "content": f"{message}\n\n{exc}",
+                        "content": message,
                     }
                 )
 
             except Exception as exc:
+                message = f"Terjadi error saat memproses pertanyaan: {exc}"
+                st.error(message)
+
                 st.session_state.messages.append(
                     {
                         "role": "assistant",
-                        "content": f"Terjadi error saat memproses pertanyaan: {exc}",
+                        "content": message,
                     }
                 )
-
-    st.rerun()
 
 
 # ============================================================
@@ -414,7 +414,9 @@ with st.sidebar:
 # MAIN — WELCOME / CHAT HISTORY
 # ============================================================
 
-if not st.session_state.messages:
+pending_question = st.session_state.pending_question
+
+if not st.session_state.messages and not pending_question:
     st.markdown(
         '<p class="welcome-title">⚖️ Regula</p>',
         unsafe_allow_html=True,
@@ -452,9 +454,12 @@ if not st.session_state.messages:
     for i, (col, question) in enumerate(zip([col1, col2, col3], example_questions)):
         with col:
             if st.button(question, use_container_width=True, key=f"example_{i}"):
-                queue_question(question)
+                # Don't render here, just queue it and rerun
+                st.session_state.pending_question = question
+                st.rerun()
 
 else:
+    # Chat history (also rendered while a pending question is processed)
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(clean_answer_for_display(message["content"]))
@@ -470,20 +475,11 @@ else:
                     render_external_citations(
                         result.get("external_citations") or [])
 
-    # The answer is requested here, below the history, on a clean layout
-    if st.session_state.awaiting_answer:
-        answer_last_question()
-
-
-# ============================================================
-# CHAT INPUT
-# ============================================================
-
-if prompt := st.chat_input(
-    "Ask about Indonesian regulations...",
-    disabled=not api_is_healthy,
-):
-    queue_question(prompt)
+    # Process queued question BELOW the history, in the normal chat position
+    if pending_question:
+        st.session_state.pending_question = None
+        send_question(pending_question)
+        st.rerun()
 
 
 # ============================================================
