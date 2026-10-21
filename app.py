@@ -128,10 +128,13 @@ if "messages" not in st.session_state:
 if "api_status" not in st.session_state:
     st.session_state.api_status = None
 
+if "pending_question" not in st.session_state:
+    st.session_state.pending_question = None
 
 # ============================================================
 # API CLIENT
 # ============================================================
+
 
 def check_api_health() -> bool:
     """Check whether the FastAPI backend is available."""
