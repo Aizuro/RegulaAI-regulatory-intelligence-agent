@@ -411,7 +411,9 @@ with st.sidebar:
 # MAIN — WELCOME / CHAT HISTORY
 # ============================================================
 
-if not st.session_state.messages:
+pending_question = st.session_state.pending_question
+
+if not st.session_state.messages and not pending_question:
     st.markdown(
         '<p class="welcome-title">⚖️ Regula</p>',
         unsafe_allow_html=True,
@@ -446,13 +448,15 @@ if not st.session_state.messages:
         "Bagaimana ketentuan mengenai hak warga negara dalam UUD 1945?",
     ]
 
-    for col, question in zip([col1, col2, col3], example_questions):
+    for i, (col, question) in enumerate(zip([col1, col2, col3], example_questions)):
         with col:
-            if st.button(question, use_container_width=True):
-                send_question(question)
+            if st.button(question, use_container_width=True, key=f"example_{i}"):
+                # Don't render here, just queue it and rerun
+                st.session_state.pending_question = question
                 st.rerun()
 
 else:
+    # Chat history (also rendered while a pending question is processed)
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(clean_answer_for_display(message["content"]))
@@ -467,6 +471,12 @@ else:
                     render_sources(result.get("sources") or [])
                     render_external_citations(
                         result.get("external_citations") or [])
+
+    # Process queued question BELOW the history, in the normal chat position
+    if pending_question:
+        st.session_state.pending_question = None
+        send_question(pending_question)
+        st.rerun()
 
 
 # ============================================================
