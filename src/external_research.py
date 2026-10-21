@@ -89,7 +89,7 @@ def _fetch(url: str, timeout: int = 10) -> str:
 def fetch_external_source(
     result: Dict[str, Any],
     timeout: int = 10,
-    max_chars: int = 20000,
+    max_chars: int = 3000,
 ) -> Dict[str, Any]:
     """
     Fetch one validated external source and return bounded text evidence.
@@ -104,7 +104,7 @@ def fetch_external_source(
             "evidence": "",
         }
 
-    max_chars = max(1000, min(int(max_chars), 50000))
+    max_chars = max(500, min(int(max_chars), 6000))
     url = str(result["url"]).strip()
 
     try:

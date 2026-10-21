@@ -35,7 +35,7 @@ def get_llm() -> ChatGroq:
         model=model_name,
         api_key=api_key,
         temperature=0.1,                  # Tetap rendah untuk dokumen hukum
-        max_tokens=2048,
+        max_tokens=1024,
         max_retries=2,                    # Retry otomatis kalau ada error sementara
     )
 

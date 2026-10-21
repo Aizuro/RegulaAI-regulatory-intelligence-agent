@@ -76,7 +76,7 @@ Rules:
 """
 
 MAX_TOOL_ROUNDS = 6
-MAX_SYNTHESIS_CHARS = 12000
+MAX_SYNTHESIS_CHARS = 6000
 
 
 def _sql_tool_schema() -> Dict[str, Any]:
@@ -303,7 +303,8 @@ def _run_tool(vectorstore, name: str, arguments: Dict[str, Any]):
 
         max_results = max(1, min(int(arguments.get("max_results", 3)), 5))
         try:
-            discovered = search_external_regulations(query, max_results=max_results)
+            discovered = search_external_regulations(
+                query, max_results=max_results)
             validated = validate_external_results(discovered)
         except Exception as exc:
             # External discovery must never break the internal legal workflow.
@@ -328,7 +329,8 @@ def _run_tool(vectorstore, name: str, arguments: Dict[str, Any]):
             evidence.append(fetched)
 
         has_evidence = any(
-            item.get("status") == "ok" and str(item.get("evidence") or "").strip()
+            item.get("status") == "ok" and str(
+                item.get("evidence") or "").strip()
             for item in evidence
         )
         return {
@@ -857,14 +859,17 @@ class RegulatoryIntelligenceAgent:
         if guard.refuse:
             state = AgentState(question=question, plan=["refuse_injection"])
             result = self._plain_result(state, REFUSAL_INJECTION)
-            result["guard"] = {"injection_detected": True, "dropped": guard.dropped_clauses}
+            result["guard"] = {"injection_detected": True,
+                               "dropped": guard.dropped_clauses}
             return result
 
         if is_legal_advice_request(guard.clean_question):
-            state = AgentState(question=question, plan=["legal_advice_disclaimer"])
+            state = AgentState(question=question, plan=[
+                               "legal_advice_disclaimer"])
             result = self._plain_result(state, REPLY_LEGAL_ADVICE)
             if guard.injection_detected:
-                result["guard"] = {"injection_detected": True, "dropped": guard.dropped_clauses}
+                result["guard"] = {"injection_detected": True,
+                                   "dropped": guard.dropped_clauses}
             return result
 
         result = self._invoke_core(guard.clean_question)
@@ -874,7 +879,8 @@ class RegulatoryIntelligenceAgent:
                 f"{result['answer']}\n\n_Catatan: instruksi tambahan yang mencoba "
                 "mengubah aturan sistem diabaikan._"
             )
-            result["guard"] = {"injection_detected": True, "dropped": guard.dropped_clauses}
+            result["guard"] = {"injection_detected": True,
+                               "dropped": guard.dropped_clauses}
         return result
 
     def _invoke_core(self, question: str) -> Dict[str, Any]:
@@ -958,7 +964,8 @@ class RegulatoryIntelligenceAgent:
         if uud_provision:
             # Teks UUD ada di corpus lokal: ambil langsung, jangan serahkan ke ingatan LLM
             # dan jangan lakukan pencarian eksternal (hasilnya hanya halaman pencarian).
-            result = _run_tool(self.vectorstore, "get_regulation", uud_provision)
+            result = _run_tool(
+                self.vectorstore, "get_regulation", uud_provision)
             normalized = self._record_step(
                 state,
                 round_number=1,
@@ -1008,7 +1015,8 @@ class RegulatoryIntelligenceAgent:
                 )
                 # Preserve the internal miss alongside external discovery status so
                 # synthesis cannot mistake a web hit for internal RAG coverage.
-                normalized["missing_regulations"] = list(state.missing_regulations)
+                normalized["missing_regulations"] = list(
+                    state.missing_regulations)
                 normalized["internal_lookup_status"] = "missing_source"
             return self._finalize(question, state, normalized)
 
@@ -1048,7 +1056,8 @@ class RegulatoryIntelligenceAgent:
                     and mentions_legal_reference(question)
                 ):
                     arguments = {"query": question, "k": 5}
-                    result = _run_tool(self.vectorstore, "search_regulations", arguments)
+                    result = _run_tool(
+                        self.vectorstore, "search_regulations", arguments)
                     normalized = self._record_step(
                         state,
                         round_number=1,
@@ -1162,8 +1171,8 @@ class RegulatoryIntelligenceAgent:
                 "source_name": official["source_name"],
                 "domain": domain,
                 "source_tier": official["source_tier"],
-                "evidence": evidence[:1200],
-                "evidence_chars": len(evidence),
+                "evidence": evidence[:3000],
+                "evidence_chars": min(len(evidence), 3000),
                 "evidence_type": str(item.get("evidence_type") or "external_web_page"),
             })
 
