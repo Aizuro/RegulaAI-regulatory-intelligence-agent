@@ -487,5 +487,6 @@ if prompt := st.chat_input(
     "Ask about Indonesian regulations...",
     disabled=not api_is_healthy,
 ):
-    send_question(prompt)
+    # Same flow as the example buttons: queue, then rerun
+    st.session_state.pending_question = prompt
     st.rerun()
