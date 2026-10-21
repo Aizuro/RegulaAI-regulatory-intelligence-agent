@@ -6,13 +6,13 @@ The frontend communicates with FastAPI /query instead of directly
 initializing or mutating the RAG/vectorstore.
 """
 
+import os
 import re
 import time
 from typing import Any, Dict, List
 
 import requests
 import streamlit as st
-import os
 
 
 # ============================================================
@@ -131,10 +131,10 @@ if "api_status" not in st.session_state:
 if "awaiting_answer" not in st.session_state:
     st.session_state.awaiting_answer = False
 
+
 # ============================================================
 # API CLIENT
 # ============================================================
-
 
 def check_api_health() -> bool:
     """Check whether the FastAPI backend is available."""
@@ -291,15 +291,6 @@ def render_missing_regulations(
                 st.write(str(item))
 
 
-def render_agent_result(result: Dict[str, Any]) -> None:
-    """Render all structured fields returned by FastAPI."""
-    st.markdown(clean_answer_for_display(result.get("answer", "")))
-
-    render_missing_regulations(result.get("missing_regulations") or [])
-    render_sources(result.get("sources") or [])
-    render_external_citations(result.get("external_citations") or [])
-
-
 # ============================================================
 # CHAT
 # ============================================================
@@ -393,68 +384,63 @@ with st.sidebar:
 
     st.divider()
 
-    # st.markdown("**Capabilities**")
-    # st.caption("🔎 Regulatory research")
-    # st.caption("⚖️ Regulation comparison")
-    # st.caption("📊 Regulatory data analysis")
-    # st.caption("📚 Source-grounded answers")
-
-    # st.divider()
-
     if st.button(
         "Clear conversation",
         use_container_width=True,
         type="secondary",
+        key="clear_conversation",
     ):
         st.session_state.messages = []
+        st.session_state.awaiting_answer = False
         st.rerun()
 
 
 # ============================================================
-# MAIN — WELCOME / CHAT HISTORY
+# MAIN — WELCOME (always visible) + CHAT HISTORY
 # ============================================================
 
-if not st.session_state.messages:
-    st.markdown(
-        '<p class="welcome-title">⚖️ Regula</p>',
-        unsafe_allow_html=True,
-    )
+st.markdown(
+    '<p class="welcome-title" style="margin-top:1rem;">⚖️ Regula</p>',
+    unsafe_allow_html=True,
+)
 
-    st.markdown(
-        '<p class="welcome-subtitle">'
-        "Regulatory Intelligence Assistant"
-        "</p>",
-        unsafe_allow_html=True,
-    )
+st.markdown(
+    '<p class="welcome-subtitle">'
+    "Regulatory Intelligence Assistant"
+    "</p>",
+    unsafe_allow_html=True,
+)
 
-    st.markdown(
-        '<p class="welcome-description">'
-        "Research, compare, and analyze Indonesian regulations with AI."
-        "</p>",
-        unsafe_allow_html=True,
-    )
+st.markdown(
+    '<p class="welcome-description">'
+    "Research, compare, and analyze Indonesian regulations with AI."
+    "</p>",
+    unsafe_allow_html=True,
+)
 
-    st.markdown(
-        "<p style='text-align:center; color:gray; font-size:0.85rem;'>"
-        "Try asking:"
-        "</p>",
-        unsafe_allow_html=True,
-    )
+st.markdown(
+    "<p style='text-align:center; color:gray; font-size:0.85rem;'>"
+    "Try asking:"
+    "</p>",
+    unsafe_allow_html=True,
+)
 
-    col1, col2, col3 = st.columns(3)
+col1, col2, col3 = st.columns(3)
 
-    example_questions = [
-        "Apa ketentuan mengenai transaksi elektronik?",
-        "Apa perbedaan UU Nomor 1 Tahun 2024 dengan UU Nomor 3 Tahun 2024 terkait transaksi elektronik?",
-        "Bagaimana ketentuan mengenai hak warga negara dalam UUD 1945?",
-    ]
+example_questions = [
+    "Apa ketentuan mengenai transaksi elektronik?",
+    "Apa perbedaan UU Nomor 1 Tahun 2024 dengan UU Nomor 3 Tahun 2024 terkait transaksi elektronik?",
+    "Bagaimana ketentuan mengenai hak warga negara dalam UUD 1945?",
+]
 
-    for i, (col, question) in enumerate(zip([col1, col2, col3], example_questions)):
-        with col:
-            if st.button(question, use_container_width=True, key=f"example_{i}"):
-                queue_question(question)
+for i, (col, question) in enumerate(zip([col1, col2, col3], example_questions)):
+    with col:
+        if st.button(question, use_container_width=True, key=f"example_{i}"):
+            queue_question(question)
 
-else:
+if st.session_state.messages:
+    st.divider()
+
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(clean_answer_for_display(message["content"]))
@@ -470,13 +456,12 @@ else:
                     render_external_citations(
                         result.get("external_citations") or [])
 
-    # The answer is requested here, below the history, on a clean layout
     if st.session_state.awaiting_answer:
         answer_last_question()
 
 
 # ============================================================
-# CHAT INPUT
+# CHAT INPUT  (must appear exactly once in this file)
 # ============================================================
 
 if prompt := st.chat_input(
