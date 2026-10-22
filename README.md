@@ -313,20 +313,6 @@ This is commonly a Git/Windows line-ending notice, not necessarily a code error.
 - SQL output and legal source evidence are distinct; structured or synthetic datasets must not be presented as authoritative legal text.
 - The application is an informational research aid, not legal advice. Users should verify material conclusions against the official regulation and consult a qualified professional when appropriate.
 
-## Next steps
-
-Use this sequence when resuming development on a new machine or project copy:
-
-1. **Confirm the folder:** run `Get-Location` and verify the repository you intend to work on.
-2. **Confirm the environment:** verify `python --version`, `sys.executable`, and `python -m pip --version`.
-3. **Finish dependency installation:** run `python -m pip install -r requirements.txt` and address the first error without changing pins prematurely.
-4. **Install and verify pytest:** run `python -m pip install pytest` if needed, then `python -m pytest --version`.
-5. **Run a focused test:** start with a test related to the feature being changed.
-6. **Run the full suite:** use `python -m pytest` and record the actual results.
-7. **Smoke-test the app:** verify the API and Streamlit UI with the correct environment variables and URLs.
-8. **Review Git changes:** use `git status --short`, `git diff --stat`, and focused `git diff -- <file>` before staging or committing. Do not use `git add .` blindly when the working tree contains unrelated or unreviewed files.
-9. **Keep deployment copies in sync deliberately:** commit and push reviewed changes to GitHub, then confirm the intended deployment service is using the updated commit.
-
 ---
 
 For development notes, current test commands, and test prerequisites, also see [`TESTING.md`](TESTING.md).
