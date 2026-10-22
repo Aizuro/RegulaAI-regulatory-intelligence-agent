@@ -1,398 +1,332 @@
-# ⚖️ Regulatory Intelligence Agent (Regula)
+# Regula — Regulatory Intelligence Agent
 
-**Regula** adalah aplikasi AI untuk membantu pencarian, pemahaman,
-perbandingan, dan analisis regulasi Indonesia. Proyek ini menggabungkan
-Retrieval-Augmented Generation (RAG), Agentic AI, pemrosesan evidence,
-dan monitoring perubahan sumber regulasi.
+Regula is an AI application for exploring Indonesian regulations. It combines retrieval-augmented generation (RAG), agent tool-calling, document comparison, evidence-grounded impact analysis, read-only structured-data queries, and controlled discovery of official regulatory sources.
 
-> **Disclaimer:** Regula merupakan proyek bantuan informasi dan
-> demonstrasi teknologi AI, bukan pengganti nasihat atau interpretasi
-> hukum profesional. Verifikasi hasil terhadap dokumen resmi dan minta
-> peninjauan ahli untuk keputusan hukum.
+## Contents
 
-## ✨ Kapabilitas Utama
+- [Overview](#overview)
+- [Capabilities](#capabilities)
+- [Architecture](#architecture)
+- [Technology stack](#technology-stack)
+- [Repository layout](#repository-layout)
+- [Environment setup](#environment-setup)
+- [Configuration](#configuration)
+- [Run the application](#run-the-application)
+- [Run tests](#run-tests)
+- [Monitoring workflow](#monitoring-workflow)
+- [Troubleshooting](#troubleshooting)
+- [Known limitations and safety boundaries](#known-limitations-and-safety-boundaries)
+- [Next steps](#next-steps)
 
--   **Regulatory retrieval (RAG):** mengambil evidence dari knowledge
-    base regulasi berbasis ChromaDB.
--   **Agentic tool calling:** memilih tool yang relevan berdasarkan
-    pertanyaan.
--   **Regulatory comparison:** membandingkan ketentuan berdasarkan
-    evidence yang berhasil diambil.
--   **SQL / data analysis:** analisis read-only terhadap dataset
-    regulasi terstruktur.
--   **External regulatory research:** pencarian lanjutan melalui sumber
-    resmi yang diizinkan.
--   **Grounded impact analysis:** analisis potensi dampak berdasarkan
-    hasil comparison, disertai validasi evidence.
--   **Regulation change monitoring:** deteksi perubahan sumber,
-    persistence state, analisis, dan notifikasi melalui workflow
-    otomatis.
--   **REST API dan UI:** FastAPI untuk backend dan Streamlit untuk
-    antarmuka.
+## Overview
 
-## 🏗️ Arsitektur
+Regula is designed to help users find and inspect regulatory evidence without treating an LLM response as a substitute for the underlying legal source. Its workflow distinguishes internal document evidence, external web evidence, and structured SQL results.
 
-### Alur pertanyaan regulasi
+The project includes a Streamlit interface and a FastAPI backend. The application also has a monitoring workflow that can be orchestrated with self-hosted n8n.
 
-``` text
-User Question
-     |
-     v
+## Capabilities
+
+- **Regulatory RAG:** retrieves relevant passages from an indexed collection of Indonesian regulations.
+- **Metadata-aware retrieval:** uses available regulation identifiers and structural metadata such as chapter, article (*Pasal*), and clause (*Ayat*), with semantic retrieval as a fallback.
+- **Agentic tool calling:** routes suitable questions to tools for retrieval, exact regulation lookup, document comparison, read-only SQL, external source discovery, and impact analysis.
+- **Document comparison:** aligns provisions and reports matched, missing, or textually different provisions as evidence for further review.
+- **Evidence-grounded impact analysis:** uses comparison evidence and can return an unknown/uncertain result when evidence is insufficient.
+- **Controlled external research:** discovers sources from configured official-source allowlists and distinguishes a search result from text actually fetched from a source.
+- **Regulatory monitoring:** checks a configured JDIH feed, detects changes using fingerprints, persists state, and can send alerts through Telegram.
+- **Redis response caching:** caches repeat requests when Redis is configured and available.
+- **API and automated tests:** includes FastAPI endpoints and tests for retrieval, parsing, monitoring, caching, comparison, impact analysis, and evidence guardrails.
+
+Capabilities depend on the current configuration, available data, API credentials, and the specific runtime environment.
+
+## Architecture
+
+```text
+User
+  |
+  v
 Streamlit UI
-     | HTTPS
-     v
-FastAPI
-     |
-     v
-Regulatory Agent
-     |
-     v
-Intent / Tool Routing
-     |
-     +-------------------+-------------------+
-     |                   |                   |
-     v                   v                   v
- Internal RAG       Comparison Engine     SQL Tools
- (ChromaDB)               |
-     |                    |
-     +--------------------+
-              |
-              v
- External Research (when applicable)
-              |
-              v
- Grounded Answer + Sources / Evidence
+  |
+  v
+FastAPI API
+  |
+  v
+Agent orchestrator
+  |-- Regulatory retrieval / RAG
+  |-- Exact regulation lookup
+  |-- Document comparison
+  |-- Read-only SQL
+  |-- Allowlisted external research
+  `-- Evidence-grounded impact analysis
+
+Monitoring path:
+JDIH feed -> n8n workflow -> FastAPI/Python monitoring logic
+           -> change detection + persisted state
+           -> analysis -> Telegram notification (when configured)
 ```
 
-Agent tidak selalu menjalankan semua jalur. Tool yang dipilih bergantung
-pada pertanyaan, hasil retrieval, dan evidence yang tersedia.
+The Streamlit UI and FastAPI backend may be deployed separately. Confirm the configured API base URL and hosting arrangement for the deployment you are working on; local development paths are not automatically valid production URLs.
 
-### Alur impact analysis V8
+## Technology stack
 
-``` text
-User Question
-     |
-     v
-Agent / Deterministic Routing
-     |
-     v
-analyze_regulation_impact
-     |
-     v
-V8.1 Document Retrieval
-     |
-     v
-V8.2 Structural Comparison
-     |
-     v
-V8.3 Grounded Impact Analysis
-     |
-     v
-Evidence Guardrail
-     |
-     v
-Agent Final Answer
+- Python
+- Streamlit
+- FastAPI
+- LangChain integrations
+- ChromaDB
+- Redis (optional cache)
+- SQLite (structured persistence / project data)
+- n8n (monitoring orchestration)
+- Pytest
+- Docker (for self-hosted services such as n8n and Redis, if used)
+
+Exact versions are controlled by `requirements.txt` and the deployment environment. Do not upgrade core dependencies casually: validate imports and tests after dependency changes.
+
+## Repository layout
+
+```text
+RegulaAI/
+├── app.py                  # Streamlit entry point
+├── requirements.txt        # Python dependencies
+├── pyproject.toml          # Project/tool configuration
+├── pytest.ini              # Pytest configuration
+├── TESTING.md              # Testing notes
+├── src/
+│   ├── api.py              # FastAPI application
+│   ├── agent_orchestrator.py
+│   ├── llm_chain.py
+│   ├── rag_chain.py
+│   ├── embeddings.py
+│   ├── document_retrieval.py
+│   ├── document_comparison.py
+│   ├── comparison_engine.py
+│   ├── impact_analysis.py
+│   ├── external_research.py
+│   ├── monitoring*.py
+│   ├── cache.py
+│   └── redis_client.py
+├── tests/                  # Unit, integration, and diagnostic tests
+├── n8n/                    # Exported monitoring workflows
+└── vectorstore/             # Local Chroma data (environment-specific)
 ```
 
-V8 menggunakan comparison engine yang sudah ada melalui adapter.
-Evidence guardrail memeriksa agar evidence pada analisis dampak merujuk
-pada ketentuan yang ada di comparison report. Ini mengurangi klaim tanpa
-dukungan, tetapi bukan jaminan bahwa hallucination dapat dihilangkan
-sepenuhnya.
+Some scripts under `tests/` are diagnostic, migration, audit, or live-integration utilities rather than ordinary unit tests. Review a script before running it, especially if its name includes `apply`, `migrate`, `cleanup`, `reconcile`, or `sync`.
 
-### Alur monitoring regulasi
+## Environment setup
 
-``` text
-Regulatory Source / JDIH
-          |
-          v
-         n8n
-          |
-          v
-    FastAPI / Python
-          |
-          v
- Change Detection + Persistence
-          |
-          v
-      AI Analysis
-          |
-          v
-        Telegram
+### 1. Use the intended project folder
+
+There have been multiple local copies of this project. Confirm which one you are working in before installing packages or editing code.
+
+```powershell
+# Example: deployment copy
+cd C:\Project\Streamlit\RegulaAI
+
+Get-Location
 ```
 
-Monitoring merupakan jalur terpisah dari tanya-jawab RAG. Perubahan
-sumber atau snapshot tidak otomatis berarti regulasi dicabut atau
-berubah secara hukum.
+The path shown in a traceback may be a different copy, such as `C:\Project\RegulaAI`. Changes made in one folder do not automatically update another folder or the GitHub repository.
 
-## 🧩 Detail Fitur
+### 2. Check installed Python versions
 
-### 1. Metadata-aware RAG
-
-ChromaDB digunakan sebagai vector store. Metadata seperti jenis, nomor,
-tahun, bab, pasal, dan ayat dapat membantu retrieval lebih terarah
-ketika identifier regulasi diketahui. Cakupan jawaban bergantung pada
-dokumen dan kualitas parsing/metadata.
-
-### 2. Regulatory comparison
-
-Comparison menyusun perbedaan berdasarkan evidence yang berhasil
-di-retrieve, seperti ketentuan yang ter-align, hanya ditemukan di
-dokumen A/B, atau memiliki teks/struktur berbeda.
-
-**Batasan:** ini adalah *structural comparison over retrieved evidence*,
-bukan full-document legal diff. Perbedaan teks atau struktur tidak
-dengan sendirinya membuktikan perubahan hukum substantif.
-
-### 3. SQL / data analysis
-
-Tool analisis data bersifat read-only untuk pertanyaan terhadap dataset
-regulasi terstruktur, jika kolom dan data yang diperlukan tersedia.
-
-### 4. External regulatory research
-
-External research digunakan ketika knowledge base internal tidak
-memadai. Dokumentasi proyek mencantumkan sumber resmi seperti JDIH BPK
-dan JDIHN, dengan validasi sumber sebelum evidence digunakan. Hasil
-bergantung pada akses situs dan konten yang dapat diambil.
-
-### 5. Grounded impact analysis
-
-Analisis dampak V8 didasarkan pada hasil retrieval dan comparison. Jika
-evidence tidak cukup, sistem dapat mengembalikan
-`impact_level = unknown` dan `requires_further_research = true`,
-alih-alih membuat kesimpulan tanpa dasar.
-
-Prinsip semantik: - Ketentuan yang hanya ditemukan pada satu dokumen
-tidak otomatis berarti dicabut atau baru berlaku. - Perbedaan teks tidak
-otomatis berarti perubahan substantif. - Hilangnya data dari snapshot
-tidak otomatis berarti pencabutan hukum. - Metadata yang hilang tidak
-boleh digunakan untuk mengarang status atau tanggal publikasi.
-
-### 6. Monitoring dan change detection
-
-Workflow monitoring menggunakan n8n untuk orkestrasi, Python/FastAPI
-untuk logika domain, persistence untuk state/snapshot, dan Telegram
-untuk notifikasi. Pengujian monitoring mencakup konsistensi
-key/fingerprint, deteksi perubahan, penolakan key duplikat, dan
-persistensi snapshot.
-
-## 🧰 Tech Stack
-
-  Area                  Teknologi
-  --------------------- ----------------------------------------------------
-  Bahasa                Python
-  LLM                   Groq API dengan model dari konfigurasi environment
-  Embedding             Google Gemini Embedding
-  Vector store          ChromaDB
-  RAG dan agent         LangChain
-  Backend API           FastAPI
-  Frontend              Streamlit
-  Workflow automation   n8n
-  Structured data       SQL / database relasional sesuai konfigurasi
-  Testing               pytest
-  Notifications         Telegram
-
-Simpan kredensial pada environment atau platform secrets. Jangan menaruh
-API key di source code atau README.
-
-## ☁️ Deployment
-
-UI menggunakan **Streamlit Community Cloud**. Berdasarkan arsitektur
-yang didokumentasikan, UI berkomunikasi melalui HTTPS dengan backend
-FastAPI yang di-host terpisah, misalnya di Render.
-
-``` text
-Streamlit Community Cloud
-        Regula UI
-            |
-            | HTTPS / POST /query
-            v
-      FastAPI Backend
-      + Agent / Tools
-      + Chroma Knowledge Base
-            |
-            v
-          LLM API
+```powershell
+py -0p
 ```
 
-Pastikan URL backend yang dikonfigurasi di Streamlit Secrets mengarah ke
-backend aktif. Nama secret, endpoint, dan command deployment perlu
-disesuaikan dengan konfigurasi repository yang benar-benar digunakan.
+Python 3.11 is a reasonable starting point for this project, subject to compatibility with the pinned dependencies. The active interpreter must be the one inside the project's virtual environment.
 
-## 🚀 Menjalankan Secara Lokal
+### 3. Create or activate a virtual environment
 
-Instruksi berikut merupakan pola umum berdasarkan dokumentasi proyek.
-Sesuaikan dengan struktur dan konfigurasi repository aktual.
+If `.venv` already exists and you intend to reuse it:
 
-### 1. Clone repository
-
-``` bash
-git clone <YOUR_REPOSITORY_URL>
-cd <REPOSITORY_DIRECTORY>
-```
-
-### 2. Buat virtual environment
-
-``` bash
-python -m venv .venv
-```
-
-Aktifkan di Windows PowerShell:
-
-``` powershell
+```powershell
 .\.venv\Scripts\Activate.ps1
 ```
 
-Linux/macOS:
+Verify the active interpreter:
 
-``` bash
-source .venv/bin/activate
+```powershell
+python --version
+python -c "import sys; print(sys.executable)"
+python -m pip --version
 ```
 
-### 3. Install dependencies
+The executable should point to the intended project's `.venv\Scripts\python.exe`, not a global Python or an Anaconda installation.
 
-``` bash
-pip install -r requirements.txt
+If you need to create a new environment, first preserve the old one if you may need it:
+
+```powershell
+py -3.11 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
 ```
 
-### 4. Konfigurasi environment
+Do not create a new `.venv` over an active environment. If replacing an existing environment, deactivate it and rename or remove the old `.venv` only after confirming that you no longer need it.
 
-Contoh variabel yang pernah digunakan dalam dokumentasi proyek:
+### 4. Install dependencies
 
-``` env
-GROQ_API_KEY=your_groq_api_key
-GOOGLE_API_KEY=your_google_api_key
-API_URL=http://127.0.0.1:8000
+With the intended `.venv` activated:
+
+```powershell
+python -m pip install -r requirements.txt
 ```
 
-Nama variabel di atas harus diverifikasi terhadap kode versi yang
-digunakan; tidak semua komponen harus memakai seluruh variabel tersebut.
+Do not proceed to application testing if this command fails. Resolve the first dependency-resolution or installation error, then rerun the command and confirm it completes.
 
-### 5. Jalankan backend dan UI
+After successful dependency installation, install pytest only if it is not already included:
 
-Contoh command backend yang tercantum dalam dokumentasi proyek:
-
-``` bash
-uvicorn src.api:app --reload
+```powershell
+python -m pip install pytest
+python -m pytest --version
 ```
 
-UI Streamlit:
+**Important:** `python -m pip install pytest` installs the test runner, not the application's dependencies. It will not install missing packages such as LangChain, FastAPI, or Redis unless they are separately specified and installed.
 
-``` bash
-streamlit run app.py
+## Configuration
+
+Create or update a local `.env` file only if the application requires it. Use the variable names referenced in the source code and hosting configuration.
+
+Typical configuration categories include:
+
+- LLM provider API key and model settings
+- Embedding provider configuration
+- FastAPI base URL used by the Streamlit frontend
+- Redis connection URL and cache settings
+- Monitoring feed/source configuration
+- Telegram bot token and destination/chat configuration
+
+The exact variable names and defaults must be confirmed in the current source code. Never commit `.env`, API keys, bot tokens, or other credentials. If a credential has been exposed, rotate it.
+
+## Run the application
+
+The entry points present in the repository include `app.py` for Streamlit and `src/api.py` for FastAPI. Confirm the application's configured launch command and required environment variables before running it.
+
+Example local commands, from the project root:
+
+```powershell
+# Streamlit UI
+python -m streamlit run app.py
 ```
 
-Jalankan di terminal terpisah. Jika entry point atau konfigurasi URL
-berbeda pada branch/deployment aktif, ikuti konfigurasi repository
-tersebut.
+For FastAPI, first inspect `src/api.py` and confirm the exported ASGI application variable. If it is named `app`, a common local command is:
 
-## 🔌 API
-
-Dokumentasi lama mencantumkan endpoint berikut:
-
--   `GET /health` --- health check backend.
--   `POST /query` --- menerima pertanyaan dan mengembalikan jawaban
-    agent.
-
-Contoh request konseptual:
-
-``` json
-{
-  "question": "Apa ketentuan dalam regulasi yang tersedia di knowledge base?"
-}
+```powershell
+python -m uvicorn src.api:app --reload
 ```
 
-Schema response mengikuti versi API yang sedang dijalankan. Periksa
-OpenAPI di `/docs` saat backend aktif; jangan mengandalkan contoh
-response lama sebagai kontrak API terkini.
+These are example commands; use the module path and app variable actually defined in the checked-out code. If the UI and API are separate, start them in separate terminals and configure the UI to point at the correct API URL.
 
-## 🧪 Testing dan Validasi
+## Run tests
 
-Proyek menggunakan unit test, contract test, integration test, serta
-test monitoring dan persistence.
+Always run tests through the active interpreter:
 
-Hasil regression suite yang tercatat dari salah satu eksekusi
-pengembangan:
-
-``` text
-Collected: 136 tests
-Passed:    126
-Skipped:    10
-Failed:      0
-Warnings:    4
+```powershell
+python -m pytest
 ```
 
-Sepuluh test yang dilewati merupakan test pre-deployment V6 bersifat
-opt-in yang menggunakan `RUN_V6_PREDEPLOYMENT=1`. Ini adalah hasil dari
-eksekusi tertentu, bukan jaminan bahwa semua branch atau deployment
-mendapat hasil identik. Jalankan kembali test pada commit yang akan
-dirilis.
+Run a focused test first when debugging a specific feature, for example:
 
-Area pengujian yang terdokumentasi: - kontrak dan routing tool impact
-analysis; - validasi evidence pada hasil analisis; - parsing JSON dan
-validasi struktur output; - integrasi retrieval → comparison → impact
-analysis; - monitoring key dan fingerprint; - deteksi sumber baru,
-berubah, atau hilang; - penolakan key duplikat; dan - persistence
-snapshot/state.
-
-Contoh menjalankan pytest:
-
-``` bash
-python -m pytest -v
+```powershell
+python -m pytest tests/test_v81_document_retrieval.py -q
+python -m pytest tests/test_v82_document_comparison.py -q
+python -m pytest tests/test_v83_impact_analysis.py -q
+python -m pytest tests/test_v84_agent_integration.py -q
 ```
 
-Gunakan virtual environment dan konfigurasi layanan yang sesuai.
-Sebagian test dapat membutuhkan Redis, corpus lokal, environment
-variable, atau flag opt-in. Untuk command spesifik, ikuti `TESTING.md`,
-`pytest.ini`, dan instruksi test di repository.
+Use only test paths that exist in the current checkout. Some tests may require local data, environment variables, a running Redis service, network access, or API credentials. Read `TESTING.md` and the individual test before running live or state-changing checks.
 
-## ⚠️ Batasan yang Diketahui
+A previous development run reported **126 passed, 10 skipped, 0 failed**, but that result applies only to the code and environment at the time of that run. It is not a claim that the current checkout passes. Record the current date, command, pass/fail/skip counts, and any required external services when validating a release.
 
-1.  **Cakupan knowledge base:** retrieval terbatas pada dokumen yang
-    tersedia dan berhasil diproses.
-2.  **Kualitas parsing:** ekstraksi PDF/OCR dan metadata Bab/Pasal/Ayat
-    dapat memengaruhi alignment.
-3.  **Structural comparison:** bukan pengganti diff hukum menyeluruh
-    atau kajian legal.
-4.  **Impact analysis:** output LLM bersifat probabilistik; guardrail
-    mengurangi klaim tanpa dukungan tetapi tidak menjamin nol
-    hallucination.
-5.  **External research:** dibatasi oleh sumber yang diizinkan,
-    ketersediaan situs, dan kemampuan mengambil konten.
-6.  **Monitoring:** perubahan sumber bukan bukti otomatis tentang
-    pencabutan atau keberlakuan hukum.
-7.  **Production readiness:** test yang lulus tidak dengan sendirinya
-    membuktikan kesiapan untuk penggunaan hukum kritis atau beban
-    produksi besar.
+## Monitoring workflow
 
-## 🎯 Tujuan Portofolio
+The repository includes exported n8n workflow files under `n8n/`. Import a workflow into the intended n8n instance only after reviewing its nodes, endpoints, credentials, and environment-specific URLs.
 
-Regula mendemonstrasikan pengalaman membangun aplikasi Applied AI yang
-mencakup: - RAG dan metadata-aware retrieval; - agentic orchestration
-dan tool calling; - comparison berbasis evidence; - SQL / structured
-data analysis; - API development dengan FastAPI; - UI dengan
-Streamlit; - source validation dan evidence-grounded generation; -
-workflow automation dengan n8n; - change detection dan persistence; -
-unit, contract, integration, dan regression testing; serta - deployment
-frontend/backend yang terpisah.
+The monitoring path is intended to:
+1. Fetch a configured regulatory feed.
+2. Normalize entries and calculate deterministic fingerprints.
+3. Compare the current feed with persisted state to identify new, updated, or removed feed entries.
+4. Persist the new state.
+5. Run analysis when configured.
+6. Send notifications for relevant events when credentials and notification settings are available.
 
-## 📌 Status Proyek
+A feed entry being removed is not, by itself, proof that a regulation has been legally revoked. Monitoring output is a signal for investigation, not a substitute for official legal verification.
 
-Dokumentasi V8.5 mencatat V8.1--V8.4 selesai untuk retrieval, structural
-comparison, grounded impact analysis, evidence guardrail, routing/tool
-integration, dan real integration test. V8.5 berfokus pada finalisasi
-dokumentasi dan pengujian.
+## Troubleshooting
 
-Status test dan deployment harus diverifikasi pada commit dan lingkungan
-yang benar-benar dipublikasikan. Regula sebaiknya dipresentasikan
-sebagai **AI application / portfolio MVP**, bukan sistem pengambilan
-keputusan hukum production-grade.
+### `ModuleNotFoundError: No module named 'langchain'` (or `fastapi`, `redis`, etc.)
 
-## 📄 Disclaimer
+This usually means dependencies were not installed in the interpreter running the command, or the wrong Python environment is active.
 
-Regulatory Intelligence Agent dibuat untuk tujuan pembelajaran,
-eksperimen, dan demonstrasi teknologi AI. Informasi yang dihasilkan
-bukan nasihat hukum. Untuk kebutuhan hukum nyata, periksa dokumen
-terbaru dari institusi resmi dan mintalah penilaian profesional yang
-kompeten.
+```powershell
+python -c "import sys; print(sys.executable)"
+python -m pip --version
+python -m pip show langchain fastapi redis
+```
+
+Both the interpreter and pip should point into the same project `.venv`. Install `requirements.txt` using that interpreter after resolving any installation errors.
+
+### `python -m pytest` returns `No module named pytest`
+
+Install pytest in the active environment:
+
+```powershell
+python -m pip install pytest
+python -m pytest --version
+```
+
+Then install the project dependencies from `requirements.txt` if that has not completed successfully.
+
+### `pip install -r requirements.txt` fails on `redis==8.1.0`
+
+Do not change the pin blindly. First collect diagnostic information:
+
+```powershell
+python --version
+python -m pip --version
+python -m pip config list
+python -m pip index versions redis
+```
+
+Python 3.11 satisfies the Python-version requirement reported for Redis 8.x, so if pip only lists older releases, check which package index or mirror pip is using and whether that index has the required release. Do not expose private index credentials when sharing the output. Only adjust `requirements.txt` after confirming package availability and compatibility with the project's Redis client usage.
+
+### `ModuleNotFoundError: No module named 'llm_chain'`
+
+This is different from a missing third-party dependency. It is a local import-path issue. The repository contains `src/llm_chain.py`; use import paths consistently with the project's package layout and how the application is launched. Before changing imports, compare the exact file and command in the folder that produced the traceback. There may be multiple local copies with different code.
+
+### Tests report many missing modules during collection
+
+A large number of collection errors can share one root cause: pytest is running with an interpreter that lacks the project's dependencies. Check `sys.executable`, install dependencies into that environment, and rerun `python -m pytest` before treating the collection errors as application bugs.
+
+### Redis connection errors
+
+Installing the Python `redis` package does not start a Redis server. If caching tests or the API require a running server, verify the configured host/port and service availability separately. Follow the project's current Redis configuration; do not assume that a successful package install means Redis is reachable.
+
+### Line-ending warning: LF will be replaced by CRLF
+
+This is commonly a Git/Windows line-ending notice, not necessarily a code error. Do not mass-convert source files merely to remove the warning. Review `git diff --check` and the actual code changes separately.
+
+## Known limitations and safety boundaries
+
+- External search snippets are discovery evidence, not verified legal text.
+- A citation should only be treated as support for a claim when the fetched source contains relevant evidence.
+- Missing or textually different provisions do not independently prove that a regulation has been revoked, newly effective, or substantively amended.
+- Impact analysis should be treated as uncertain when the available evidence does not support a reliable conclusion.
+- SQL output and legal source evidence are distinct; structured or synthetic datasets must not be presented as authoritative legal text.
+- The application is an informational research aid, not legal advice. Users should verify material conclusions against the official regulation and consult a qualified professional when appropriate.
+
+## Next steps
+
+Use this sequence when resuming development on a new machine or project copy:
+
+1. **Confirm the folder:** run `Get-Location` and verify the repository you intend to work on.
+2. **Confirm the environment:** verify `python --version`, `sys.executable`, and `python -m pip --version`.
+3. **Finish dependency installation:** run `python -m pip install -r requirements.txt` and address the first error without changing pins prematurely.
+4. **Install and verify pytest:** run `python -m pip install pytest` if needed, then `python -m pytest --version`.
+5. **Run a focused test:** start with a test related to the feature being changed.
+6. **Run the full suite:** use `python -m pytest` and record the actual results.
+7. **Smoke-test the app:** verify the API and Streamlit UI with the correct environment variables and URLs.
+8. **Review Git changes:** use `git status --short`, `git diff --stat`, and focused `git diff -- <file>` before staging or committing. Do not use `git add .` blindly when the working tree contains unrelated or unreviewed files.
+9. **Keep deployment copies in sync deliberately:** commit and push reviewed changes to GitHub, then confirm the intended deployment service is using the updated commit.
+
+---
+
+For development notes, current test commands, and test prerequisites, also see [`TESTING.md`](TESTING.md).
